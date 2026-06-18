@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "version": 2,
+  "title": "Graphify executor",
+  "description": "Run Graphify on a single Nx project",
+  "type": "object",
+  "properties": {
+    "outputDir": {
+      "type": "string",
+      "description": "Where Graphify outputs are written",
+      "default": "graphify-out"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["normal", "deep"],
+      "description": "Extraction mode: \"normal\" or \"deep\" (more aggressive inference)",
+      "default": "normal"
+    },
+    "update": {
+      "type": "boolean",
+      "description": "Re-extract changed files only, merge into the existing graph",
+      "default": false
+    },
+    "clusterOnly": {
+      "type": "boolean",
+      "description": "Rerun clustering without re-extraction",
+      "default": false
+    },
+    "noViz": {
+      "type": "boolean",
+      "description": "Skip graph.html, produce report + JSON only",
+      "default": false
+    },
+    "wiki": {
+      "type": "boolean",
+      "description": "Export Wikipedia-style markdown per community",
+      "default": false
+    },
+    "obsidian": {
+      "type": "boolean",
+      "description": "Export an Obsidian vault",
+      "default": false
+    },
+    "svg": {
+      "type": "boolean",
+      "description": "Export graph.svg",
+      "default": false
+    },
+    "graphml": {
+      "type": "boolean",
+      "description": "Export graph.graphml (Gephi/yEd)",
+      "default": false
+    },
+    "neo4j": {
+      "type": "boolean",
+      "description": "Generate cypher.txt",
+      "default": false
+    },
+    "neo4jPush": {
+      "type": "string",
+      "description": "bolt:// URL to push directly to Neo4j"
+    }
+  },
+  "required": []
+}
