@@ -8,11 +8,14 @@
     "@eslint/js": "^9.8.0",
     "@nx/eslint": "23.0.0",
     "@nx/eslint-plugin": "23.0.0",
+    "@nx/jest": "23.0.0",
     "@nx/js": "23.0.0",
+    "@nx/plugin": "23.0.0",
     "@nx/vite": "23.0.0",
     "@nx/vitest": "23.0.0",
     "@nx/web": "23.0.0",
     "@swc-node/register": "1.11.1",
+    "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
     "@types/node": "20.19.9",
@@ -43,5 +46,7 @@
       }
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "@nx/devkit": "23.0.0"
+  }
 }
