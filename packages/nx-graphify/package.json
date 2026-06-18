@@ -16,8 +16,10 @@
   },
   "files": [
     "dist",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "executors.json"
   ],
+  "executors": "./executors.json",
   "nx": {
     "targets": {
       "build": {
