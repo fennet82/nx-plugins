@@ -20,6 +20,8 @@ export default async function initGenerator(
   }
 
   const graphifyInstalled = checkGraphifyInstalled();
+  // Unlike the executors, we don't throw here — editing project config is harmless
+  // even if graphify isn't installed yet; the target will work once it is.
   if (!graphifyInstalled) {
     logger.warn(
       'graphify CLI not found. See installation instructions at: ' +
@@ -63,7 +65,15 @@ export default async function initGenerator(
     } else {
       const command = `graphify ${installAgent} install`;
       logger.info(`Running: ${command}`);
-      execSync(command, { stdio: 'inherit' });
+      try {
+        execSync(command, { stdio: 'inherit' });
+      } catch (error) {
+        logger.warn(
+          `Agent installation failed: ${(error as Error).message}\n` +
+            `The graphify target was still added successfully — you can run ` +
+            `\`graphify ${installAgent} install\` manually.`
+        );
+      }
     }
   }
 

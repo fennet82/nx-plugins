@@ -99,4 +99,28 @@ describe('init generator', () => {
 
     expect(execSync).not.toHaveBeenCalled();
   });
+
+  it('warns instead of throwing when agent installation fails', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (execSync as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      throw new Error('command not found');
+    });
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+
+    await expect(
+      initGenerator(tree, { project: 'foo', installAgent: 'claude' })
+    ).resolves.toBeUndefined();
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Agent installation failed: command not found')
+    );
+  });
+
+  it('throws when the specified project does not exist', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+    await expect(initGenerator(tree, { project: 'does-not-exist' })).rejects.toThrow(
+      'Project "does-not-exist" not found in the workspace.'
+    );
+  });
 });
