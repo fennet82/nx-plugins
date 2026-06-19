@@ -1,47 +1,40 @@
 {
   "$schema": "https://json-schema.org/schema",
   "$id": "NxGraphifyInit",
-  "title": "Add graphify targets to Nx projects",
+  "title": "Install AI assistant skills for Graphify",
   "type": "object",
   "properties": {
-    "project": {
-      "type": "string",
-      "description": "Specific project name to add the graphify target to"
-    },
-    "all": {
-      "type": "boolean",
-      "description": "Add the graphify target to all projects",
-      "default": false
-    },
     "installAgent": {
-      "type": "string",
-      "description": "Optionally run `graphify <agent> install` for your AI coding assistant",
-      "enum": [
-        "none",
-        "claude",
-        "codex",
-        "opencode",
-        "kilo",
-        "aider",
-        "copilot",
-        "claw",
-        "droid",
-        "trae",
-        "trae-cn",
-        "hermes",
-        "kiro",
-        "pi",
-        "codebuddy",
-        "antigravity",
-        "antigravity-windows",
-        "windows",
-        "kimi",
-        "amp",
-        "devin",
-        "gemini",
-        "cursor"
-      ],
-      "default": "none"
+      "type": "array",
+      "description": "Run `graphify install --platforms <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--installAgent=claude --installAgent=cursor).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "claude",
+          "codex",
+          "opencode",
+          "kilo",
+          "aider",
+          "copilot",
+          "claw",
+          "droid",
+          "trae",
+          "trae-cn",
+          "hermes",
+          "kiro",
+          "pi",
+          "codebuddy",
+          "antigravity",
+          "antigravity-windows",
+          "windows",
+          "kimi",
+          "amp",
+          "devin",
+          "gemini",
+          "cursor"
+        ]
+      },
+      "default": []
     }
   },
   "required": []

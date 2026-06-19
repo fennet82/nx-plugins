@@ -1,5 +1,4 @@
 export type InstallAgent =
-  | 'none'
   | 'claude'
   | 'codex'
   | 'opencode'
@@ -24,7 +23,5 @@ export type InstallAgent =
   | 'cursor';
 
 export interface InitGeneratorSchema {
-  project?: string;
-  all?: boolean;
-  installAgent?: InstallAgent;
+  installAgent?: InstallAgent[];
 }

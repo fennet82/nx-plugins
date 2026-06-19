@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
-import { addProjectConfiguration, logger, readProjectConfiguration, type Tree } from '@nx/devkit';
+import { logger, type Tree } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import initGenerator from './generator';
@@ -18,109 +18,72 @@ describe('init generator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tree = createTreeWithEmptyWorkspace();
-    addProjectConfiguration(tree, 'foo', { root: 'apps/foo', targets: {} });
-    addProjectConfiguration(tree, 'bar', { root: 'apps/bar', targets: {} });
   });
 
-  it('throws when neither project nor all is set', async () => {
+  it('throws when installAgent is not set', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     await expect(initGenerator(tree, {})).rejects.toThrow(
-      'You must specify either --project=<name> or --all to add the graphify target.'
+      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
     );
   });
 
-  it('adds the graphify target to the specified project only', async () => {
+  it('throws when installAgent is an empty array', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await initGenerator(tree, { project: 'foo' });
-
-    const foo = readProjectConfiguration(tree, 'foo');
-    expect(foo.targets?.graphify).toEqual({
-      executor: 'nx-graphify:graphify',
-      options: { outputDir: 'graphify-out' },
-    });
-
-    const bar = readProjectConfiguration(tree, 'bar');
-    expect(bar.targets?.graphify).toBeUndefined();
+    await expect(initGenerator(tree, { installAgent: [] })).rejects.toThrow(
+      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
+    );
   });
 
-  it('adds the graphify target to every project when all is set', async () => {
-    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
-
-    await initGenerator(tree, { all: true });
-
-    expect(readProjectConfiguration(tree, 'foo').targets?.graphify).toBeDefined();
-    expect(readProjectConfiguration(tree, 'bar').targets?.graphify).toBeDefined();
-  });
-
-  it('warns instead of throwing when graphify is not installed', async () => {
+  it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
-    await initGenerator(tree, { project: 'foo' });
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-      )
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
     );
-    expect(readProjectConfiguration(tree, 'foo').targets?.graphify).toBeDefined();
+    expect(execSync).not.toHaveBeenCalled();
   });
 
-  it('runs `graphify <agent> install` after scaffolding when installAgent is set and graphify is installed', async () => {
+  it('runs a single `graphify install --platforms <agent>` call for one agent', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await initGenerator(tree, { project: 'foo', installAgent: 'claude' });
+    await initGenerator(tree, { installAgent: ['claude'] });
 
-    expect(execSync).toHaveBeenCalledWith('graphify claude install', {
+    expect(execSync).toHaveBeenCalledWith('graphify install --platforms claude', {
       stdio: 'inherit',
     });
   });
 
-  it('skips agent installation and warns when graphify is not installed', async () => {
-    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
-
-    await initGenerator(tree, { project: 'foo', installAgent: 'claude' });
-
-    expect(execSync).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Skipping agent installation — graphify must be installed first. Run `graphify claude install` manually after installing graphify.'
-      )
-    );
-  });
-
-  it('does not run agent installation when installAgent is "none"', async () => {
+  it('joins multiple agents with "|" in a single install command', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await initGenerator(tree, { project: 'foo', installAgent: 'none' });
+    await initGenerator(tree, { installAgent: ['claude', 'cursor', 'codex'] });
 
-    expect(execSync).not.toHaveBeenCalled();
+    expect(execSync).toHaveBeenCalledWith(
+      'graphify install --platforms claude|cursor|codex',
+      { stdio: 'inherit' }
+    );
+    expect(execSync).toHaveBeenCalledTimes(1);
   });
 
-  it('warns instead of throwing when agent installation fails', async () => {
+  it('logs the command before running it', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const infoSpy = vi.spyOn(logger, 'info').mockImplementation(() => undefined);
+
+    await initGenerator(tree, { installAgent: ['claude'] });
+
+    expect(infoSpy).toHaveBeenCalledWith('Running: graphify install --platforms claude');
+  });
+
+  it('propagates the error when the install command fails', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (execSync as ReturnType<typeof vi.fn>).mockImplementation(() => {
       throw new Error('command not found');
     });
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
-    await expect(
-      initGenerator(tree, { project: 'foo', installAgent: 'claude' })
-    ).resolves.toBeUndefined();
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Agent installation failed: command not found')
-    );
-  });
-
-  it('throws when the specified project does not exist', async () => {
-    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
-
-    await expect(initGenerator(tree, { project: 'does-not-exist' })).rejects.toThrow(
-      'Project "does-not-exist" not found in the workspace.'
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
+      'command not found'
     );
   });
 });
