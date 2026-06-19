@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { CreateNodesContext } from '@nx/devkit';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { createNodes } from './index';
 
 function fakeContext(): CreateNodesContext {
@@ -76,5 +78,37 @@ describe('createNodes', () => {
       cache: true,
     });
     expect(projectsByRoot['apps/foo'].targets!['graphify-workspace']).toBeUndefined();
+  });
+
+  it('only emits executor strings that are registered in executors.json', async () => {
+    const executorsJsonPath = join(__dirname, '../../executors.json');
+    const executorsJson = JSON.parse(readFileSync(executorsJsonPath, 'utf-8')) as {
+      executors: Record<string, unknown>;
+    };
+    const registeredExecutorKeys = Object.keys(executorsJson.executors);
+
+    const result = await createNodesFunction(
+      ['package.json', 'apps/foo/project.json'],
+      {},
+      fakeContext()
+    );
+
+    const emittedTargets = result.flatMap(([, { projects }]) =>
+      Object.values(projects ?? {}).flatMap((project) =>
+        Object.values(project.targets ?? {})
+      )
+    );
+
+    const emittedExecutors = emittedTargets
+      .map((target) => target.executor)
+      .filter((executor): executor is string => typeof executor === 'string');
+
+    expect(emittedExecutors.length).toBeGreaterThan(0);
+
+    for (const executor of emittedExecutors) {
+      const [pluginName, executorKey] = executor.split(':');
+      expect(pluginName).toBe('nx-graphify');
+      expect(registeredExecutorKeys).toContain(executorKey);
+    }
   });
 });

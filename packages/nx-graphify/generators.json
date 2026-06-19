@@ -3,7 +3,7 @@
     "init": {
       "factory": "./dist/generators/init/generator",
       "schema": "./dist/generators/init/schema.json",
-      "description": "Add graphify targets to Nx projects and optionally configure an AI coding assistant"
+      "description": "Install Graphify skills for one or more AI coding assistants"
     }
   }
 }
