@@ -57,4 +57,24 @@ describe('createNodes', () => {
     const projectRoots = result.flatMap(([, { projects }]) => Object.keys(projects ?? {}));
     expect(projectRoots.sort()).toEqual(['apps/foo', 'libs/bar']);
   });
+
+  it('attaches graphify-workspace only at the workspace root', async () => {
+    const result = await createNodesFunction(
+      ['package.json', 'apps/foo/project.json'],
+      {},
+      fakeContext()
+    );
+
+    const projectsByRoot = Object.fromEntries(
+      result.flatMap(([, { projects }]) => Object.entries(projects ?? {}))
+    );
+
+    expect(projectsByRoot['.'].targets!['graphify-workspace']).toEqual({
+      executor: 'nx-graphify:graphify-workspace',
+      options: { outputDir: 'graphify-out', mode: 'normal' },
+      outputs: ['{workspaceRoot}/graphify-out'],
+      cache: true,
+    });
+    expect(projectsByRoot['apps/foo'].targets!['graphify-workspace']).toBeUndefined();
+  });
 });

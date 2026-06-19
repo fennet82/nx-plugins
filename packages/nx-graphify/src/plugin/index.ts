@@ -1,4 +1,4 @@
-import type { CreateNodes, CreateNodesContext } from '@nx/devkit';
+import type { CreateNodes, CreateNodesContext, TargetConfiguration } from '@nx/devkit';
 import { createNodesFromFiles } from '@nx/devkit';
 import { dirname } from 'node:path';
 import type { GraphifyExecutorSchema } from '../executors/graphify/schema';
@@ -38,19 +38,28 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
         const projectRoot = dirname(configFile);
         const resolvedOptions = resolveGraphifyOptions(options);
 
+        const targets: Record<string, TargetConfiguration> = {
+          graphify: {
+            executor: 'nx-graphify:graphify',
+            options: resolvedOptions,
+            inputs: ['default', '^default'],
+            outputs: [`{projectRoot}/${resolvedOptions.outputDir}`],
+            cache: true,
+          },
+        };
+
+        if (projectRoot === '.') {
+          targets['graphify-workspace'] = {
+            executor: 'nx-graphify:graphify-workspace',
+            options: resolvedOptions,
+            outputs: [`{workspaceRoot}/${resolvedOptions.outputDir}`],
+            cache: true,
+          };
+        }
+
         return {
           projects: {
-            [projectRoot]: {
-              targets: {
-                graphify: {
-                  executor: 'nx-graphify:graphify',
-                  options: resolvedOptions,
-                  inputs: ['default', '^default'],
-                  outputs: [`{projectRoot}/${resolvedOptions.outputDir}`],
-                  cache: true,
-                },
-              },
-            },
+            [projectRoot]: { targets },
           },
         };
       },
