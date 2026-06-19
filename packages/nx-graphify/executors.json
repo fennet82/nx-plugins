@@ -3,16 +3,12 @@
     "graphify": {
       "implementation": "./dist/executors/graphify/executor",
       "schema": "./dist/executors/graphify/schema.json",
-      "description": "Run Graphify on a single Nx project",
-      "inputs": ["default", "^default"],
-      "outputs": ["{options.outputDir}"]
+      "description": "Run Graphify on a single Nx project"
     },
     "graphify-workspace": {
       "implementation": "./dist/executors/graphify-workspace/executor",
       "schema": "./dist/executors/graphify-workspace/schema.json",
-      "description": "Run Graphify on the entire workspace",
-      "inputs": ["default", "^default"],
-      "outputs": ["{options.outputDir}"]
+      "description": "Run Graphify on the entire workspace"
     }
   }
 }
