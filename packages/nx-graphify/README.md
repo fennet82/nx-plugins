@@ -10,6 +10,10 @@ Graphify must be installed separately:
 
 ```bash
 pip install graphifyy
+# or
+uv tool install graphifyy
+# or
+pipx install graphifyy
 ```
 
 See https://github.com/safishamsi/graphify#install for full installation
@@ -17,17 +21,42 @@ instructions.
 
 ## Setup
 
-```bash
-nx g nx-graphify:init --project=my-app
-# or, for every project in the workspace:
-nx g nx-graphify:init --all
+Register the plugin in your workspace's `nx.json`:
+
+```json
+{
+  "plugins": [
+    {
+      "plugin": "nx-graphify/plugin",
+      "options": {
+        "outputDir": "graphify-out",
+        "mode": "normal"
+      }
+    }
+  ]
+}
 ```
 
-Optionally configure an AI coding assistant's Graphify skill at the same time:
+That's it — every project automatically gets a `graphify` target, and the
+workspace root automatically gets a `graphify-workspace` target. No
+generator, no per-project scaffolding.
+
+The `options` block sets workspace-wide defaults (any of the options in the
+table below). An individual project can still override them by adding its
+own `targets.graphify.options` to its `project.json` — Nx merges that over
+the inferred defaults automatically.
+
+### AI coding assistant skills
 
 ```bash
-nx g nx-graphify:init --project=my-app --installAgent=claude
+nx g nx-graphify:init --installAgent=claude
+# or multiple at once, installed in a single call:
+nx g nx-graphify:init --installAgent=claude --installAgent=cursor
 ```
+
+This runs `graphify install --platforms claude|cursor` for you. It's a
+one-time, workspace-root-level operation, unrelated to which projects have
+a `graphify` target.
 
 ## Targets
 
@@ -44,9 +73,9 @@ cached by Nx like any other target.
 
 ### `graphify-workspace` (whole monorepo)
 
-Add this target by hand to any `project.json`/`package.json` (e.g. the
-workspace root project), pointing at the `nx-graphify:graphify-workspace`
-executor, to build a single knowledge graph across the entire repo.
+Automatically attached to the workspace root once the plugin is registered
+in `nx.json` (see Setup). Runs Graphify against the entire workspace from
+`context.root`.
 
 ## Options
 
