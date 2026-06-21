@@ -24,7 +24,7 @@ describe('createNodes', () => {
 
     const [, { projects }] = result[0];
     expect(projects!['apps/foo'].targets!.graphify).toEqual({
-      executor: 'nx-graphify:graphify',
+      executor: '@fennet82/nx-graphify:graphify',
       options: { outputDir: 'graphify-out', mode: 'normal' },
       inputs: ['default', '^default'],
       outputs: ['{projectRoot}/graphify-out'],
@@ -72,7 +72,7 @@ describe('createNodes', () => {
     );
 
     expect(projectsByRoot['.'].targets!['graphify-workspace']).toEqual({
-      executor: 'nx-graphify:graphify-workspace',
+      executor: '@fennet82/nx-graphify:graphify-workspace',
       options: { outputDir: 'graphify-out', mode: 'normal' },
       outputs: ['{workspaceRoot}/graphify-out'],
       cache: true,
@@ -107,7 +107,7 @@ describe('createNodes', () => {
 
     for (const executor of emittedExecutors) {
       const [pluginName, executorKey] = executor.split(':');
-      expect(pluginName).toBe('nx-graphify');
+      expect(pluginName).toBe('@fennet82/nx-graphify');
       expect(registeredExecutorKeys).toContain(executorKey);
     }
   });
@@ -124,11 +124,11 @@ describe('createNodes', () => {
     );
 
     expect(projectsByRoot['.'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
+      executor: '@fennet82/nx-graphify:purge',
       options: { outputDir: 'graphify-out' },
     });
     expect(projectsByRoot['apps/foo'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
+      executor: '@fennet82/nx-graphify:purge',
       options: { outputDir: 'graphify-out' },
     });
   });
@@ -142,7 +142,7 @@ describe('createNodes', () => {
 
     const [, { projects }] = result[0];
     expect(projects!['apps/foo'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
+      executor: '@fennet82/nx-graphify:purge',
       options: { outputDir: 'custom-out' },
     });
   });

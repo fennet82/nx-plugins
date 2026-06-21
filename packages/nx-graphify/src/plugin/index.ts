@@ -41,21 +41,21 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
 
         const targets: Record<string, TargetConfiguration> = {
           graphify: {
-            executor: 'nx-graphify:graphify',
+            executor: '@fennet82/nx-graphify:graphify',
             options: resolvedOptions,
             inputs: ['default', '^default'],
             outputs: [`{projectRoot}/${resolvedOptions.outputDir}`],
             cache: true,
           },
           purge: {
-            executor: 'nx-graphify:purge',
+            executor: '@fennet82/nx-graphify:purge',
             options: { outputDir: resolvedOptions.outputDir },
           },
         };
 
         if (projectRoot === '.') {
           targets['graphify-workspace'] = {
-            executor: 'nx-graphify:graphify-workspace',
+            executor: '@fennet82/nx-graphify:graphify-workspace',
             options: resolvedOptions,
             outputs: [`{workspaceRoot}/${resolvedOptions.outputDir}`],
             cache: true,

@@ -17,6 +17,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
-  globalSetup: '../../tools/scripts/start-local-registry.ts',
-  globalTeardown: '../../tools/scripts/stop-local-registry.ts',
+  testTimeout: 120000,
 };
