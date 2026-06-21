@@ -1,15 +1,23 @@
 {
-  "name": "nx-graphify",
+  "name": "@fennet82/nx-graphify",
   "version": "0.1.0",
-  "description": "Nx plugin for Graphify — build knowledge graphs from your monorepo projects",
+  "description": "Nx self-inferring plugin for Graphify — build knowledge graphs from your monorepo projects",
+  "homepage": "https://github.com/fennet82/nx-plugins/blob/main/packages/nx-graphify",
+  "license": "MIT",
+  "author": {
+    "name": "elad cohen"
+  },
   "keywords": [
     "nx-plugin",
     "nx",
-    "graphify"
+    "graphify",
+    "knowledge graph",
+    "node"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fennet82/nx-graphify.git"
+    "url": "https://github.com/fennet82/nx-plugins.git",
+    "directory": "packages/nx-graphify"
   },
   "type": "commonjs",
   "main": "./dist/index.js",

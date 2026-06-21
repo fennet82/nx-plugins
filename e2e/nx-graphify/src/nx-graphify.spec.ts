@@ -68,6 +68,9 @@ describe('nx-graphify', () => {
 
   afterAll(() => {
     cleanup();
+    if (fakeGraphifyBinDir) {
+      rmSync(fakeGraphifyBinDir, { recursive: true, force: true });
+    }
     if (originalPath !== undefined) {
       process.env.PATH = originalPath;
     }
