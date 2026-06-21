@@ -13,14 +13,16 @@ export default async function initGenerator(
     );
   }
 
+  let command = 'graphify install --project';
   const installAgents = options.installAgent ?? [];
   if (installAgents.length === 0) {
     logger.warn(
       "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor|...`).",
     );
+  } else {
+    command = `${command} --platform ${installAgents.join('|')}`;
   }
 
-  const command = `graphify install --project --platforms ${installAgents.join('|')}`;
   logger.info(`Running: ${command}`);
   execSync(command, { stdio: 'inherit' });
 }

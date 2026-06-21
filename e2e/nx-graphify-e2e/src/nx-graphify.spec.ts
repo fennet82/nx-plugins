@@ -76,10 +76,10 @@ describe('nx-graphify', () => {
     }
   });
 
-  it('runs `graphify install --project --platforms <agent>` via the init generator', async () => {
+  it('runs `graphify install --project --platform <agent>` via the init generator', async () => {
     await runNxCommandAsync('g @fennet82/nx-graphify:init --installAgent=claude');
 
-    expect(readFile(graphifyLogFile)).toContain('install --project --platforms claude');
+    expect(readFile(graphifyLogFile)).toContain('install --project --platform claude');
   });
 
   it('runs `graphify uninstall --project --platform <agent>` via the uninstall-agents generator', async () => {

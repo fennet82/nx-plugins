@@ -54,12 +54,13 @@ nx g @fennet82/nx-graphify:init --installAgent=claude
 nx g @fennet82/nx-graphify:init --installAgent=claude --installAgent=cursor
 ```
 
-This runs `graphify install --project --platforms claude|cursor` for you.
+This runs `graphify install --project --platform claude|cursor` for you.
 It's a one-time, workspace-root-level operation, unrelated to which
 projects have a `graphify` target. `--project` is graphify's own
 project-vs-global install flag — this plugin always passes it, so the
 skills are installed for this workspace, not globally for your user
-account.
+account. If you omit `--installAgent`, it runs `graphify install --project`
+with no `--platform` flag at all.
 
 To remove agent skills again:
 

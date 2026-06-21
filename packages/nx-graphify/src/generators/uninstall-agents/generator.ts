@@ -13,14 +13,16 @@ export default async function uninstallAgentsGenerator(
     );
   }
 
+  let command = 'graphify uninstall --project';
   const agents = options.agent ?? [];
   if (agents.length === 0) {
     throw new Error(
       'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).',
     );
+  } else {
+    command = `${command} --platform ${agents.join('|')}`;
   }
 
-  const command = `graphify uninstall --project --platform ${agents.join('|')}`;
   logger.info(`Running: ${command}`);
   execSync(command, { stdio: 'inherit' });
 }

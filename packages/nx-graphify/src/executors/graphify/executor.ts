@@ -7,11 +7,11 @@ import type { GraphifyExecutorSchema } from './schema';
 
 const runExecutor: PromiseExecutor<GraphifyExecutorSchema> = async (
   options,
-  context: ExecutorContext
+  context: ExecutorContext,
 ) => {
   if (!checkGraphifyInstalled()) {
     throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
     );
   }
 
