@@ -1,6 +1,11 @@
 {
-  "name": "@org/source",
-  "version": "0.0.0",
+  "name": "@fennet82/nx-plugins",
+  "description": "A collection of third-party Nx plugins based (took inspo from https://github.com/nx-go/nx-go and https://github.com/berenddeboer/nx-plugins)",
+  "author": {
+    "name": "elad cohen"
+  },
+  "homepage": "https://github.com/fennet82/nx-plugins",
+  "version": "0.0.0-e2e",
   "license": "MIT",
   "scripts": {},
   "private": true,
@@ -18,14 +23,23 @@
     "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
+    "@swc/jest": "~0.2.38",
+    "@types/jest": "~30.0.0",
     "@types/node": "20.19.9",
     "@vitest/coverage-v8": "~4.1.0",
     "@vitest/ui": "~4.1.0",
+    "commitlint": "^21.0.2",
     "eslint": "~8.57.0",
+    "husky": "^9.1.7",
+    "jest": "~30.3.0",
+    "jest-environment-jsdom": "~30.3.0",
+    "jest-util": "~30.3.0",
     "jiti": "2.4.2",
     "jsonc-eslint-parser": "^2.1.0",
     "nx": "23.0.0",
     "prettier": "^3.8.1",
+    "ts-jest": "^29.4.0",
+    "ts-node": "10.9.1",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
@@ -45,5 +59,9 @@
         }
       }
     }
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {}
 }
