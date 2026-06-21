@@ -21,3 +21,14 @@ export type InstallAgent =
   | 'devin'
   | 'gemini'
   | 'cursor';
+
+export type ProviderBackend =
+  | 'azure'
+  | 'bedrock'
+  | 'claude'
+  | 'claude-cli'
+  | 'deepseek'
+  | 'gemini'
+  | 'kimi'
+  | 'ollama'
+  | 'openai';

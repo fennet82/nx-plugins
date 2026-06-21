@@ -27,7 +27,7 @@ describe('init generator', () => {
     await initGenerator(tree, {});
 
     expect(warnSpy).toHaveBeenCalledWith(
-      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`)."
+      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor|...`)."
     );
     expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms ', {
       stdio: 'inherit',

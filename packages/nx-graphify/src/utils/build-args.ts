@@ -1,13 +1,6 @@
-export type ProviderBackend =
-  | 'azure'
-  | 'bedrock'
-  | 'claude'
-  | 'claude-cli'
-  | 'deepseek'
-  | 'gemini'
-  | 'kimi'
-  | 'ollama'
-  | 'openai';
+import type { ProviderBackend } from './types';
+
+export type { ProviderBackend };
 
 export interface GraphifyArgsOptions {
   mode?: 'normal' | 'deep';

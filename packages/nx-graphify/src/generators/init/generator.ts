@@ -16,7 +16,7 @@ export default async function initGenerator(
   const installAgents = options.installAgent ?? [];
   if (installAgents.length === 0) {
     logger.warn(
-      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).",
+      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor|...`).",
     );
   }
 
