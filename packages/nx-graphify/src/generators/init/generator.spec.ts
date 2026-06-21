@@ -20,20 +20,30 @@ describe('init generator', () => {
     tree = createTreeWithEmptyWorkspace();
   });
 
-  it('throws when installAgent is not set', async () => {
+  it('warns and runs an empty --platforms install when installAgent is not set', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
-    await expect(initGenerator(tree, {})).rejects.toThrow(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
+    await initGenerator(tree, {});
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`)."
     );
+    expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms ', {
+      stdio: 'inherit',
+    });
   });
 
-  it('throws when installAgent is an empty array', async () => {
+  it('warns and runs an empty --platforms install when installAgent is an empty array', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
-    await expect(initGenerator(tree, { installAgent: [] })).rejects.toThrow(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
-    );
+    await initGenerator(tree, { installAgent: [] });
+
+    expect(warnSpy).toHaveBeenCalled();
+    expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms ', {
+      stdio: 'inherit',
+    });
   });
 
   it('throws when graphify is not installed', async () => {
@@ -45,12 +55,12 @@ describe('init generator', () => {
     expect(execSync).not.toHaveBeenCalled();
   });
 
-  it('runs a single `graphify install --platforms <agent>` call for one agent', async () => {
+  it('runs a single `graphify install --project --platforms <agent>` call for one agent', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     await initGenerator(tree, { installAgent: ['claude'] });
 
-    expect(execSync).toHaveBeenCalledWith('graphify install --platforms claude', {
+    expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms claude', {
       stdio: 'inherit',
     });
   });
@@ -61,7 +71,7 @@ describe('init generator', () => {
     await initGenerator(tree, { installAgent: ['claude', 'cursor', 'codex'] });
 
     expect(execSync).toHaveBeenCalledWith(
-      'graphify install --platforms claude|cursor|codex',
+      'graphify install --project --platforms claude|cursor|codex',
       { stdio: 'inherit' }
     );
     expect(execSync).toHaveBeenCalledTimes(1);
@@ -73,7 +83,7 @@ describe('init generator', () => {
 
     await initGenerator(tree, { installAgent: ['claude'] });
 
-    expect(infoSpy).toHaveBeenCalledWith('Running: graphify install --platforms claude');
+    expect(infoSpy).toHaveBeenCalledWith('Running: graphify install --project --platforms claude');
   });
 
   it('propagates the error when the install command fails', async () => {
