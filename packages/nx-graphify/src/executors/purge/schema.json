@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "version": 2,
+  "title": "Purge executor",
+  "description": "Remove a project's or the workspace's graphify-out directory",
+  "type": "object",
+  "properties": {
+    "outputDir": {
+      "type": "string",
+      "description": "Where Graphify outputs are written. graphify does not yet support a custom directory for `uninstall --purge` (always graphify-out) — kept here only so this target's outputs declaration matches the real on-disk path.",
+      "default": "graphify-out"
+    }
+  },
+  "required": []
+}

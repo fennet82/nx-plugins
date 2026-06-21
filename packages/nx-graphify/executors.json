@@ -9,6 +9,11 @@
       "implementation": "./dist/executors/graphify-workspace/executor",
       "schema": "./dist/executors/graphify-workspace/schema.json",
       "description": "Run Graphify on the entire workspace"
+    },
+    "purge": {
+      "implementation": "./dist/executors/purge/executor",
+      "schema": "./dist/executors/purge/schema.json",
+      "description": "Remove a project's or the workspace's graphify-out directory"
     }
   }
 }
