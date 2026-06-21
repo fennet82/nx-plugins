@@ -14,7 +14,7 @@ packages/nx-graphify/   the published plugin (@fennet82/nx-graphify)
     plugin/             createNodes target inference
     utils/              shared CLI-arg building, agent/backend enums
 e2e/
-  nx-graphify/           e2e tests for @fennet82/nx-graphify (@nx/plugin/testing)
+  nx-graphify-e2e/       e2e tests for @fennet82/nx-graphify (@nx/plugin/testing)
 docs/superpowers/
   specs/                 design specs
   plans/                 implementation plans
