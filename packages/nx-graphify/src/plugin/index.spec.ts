@@ -19,7 +19,7 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       {},
-      fakeContext()
+      fakeContext(),
     );
 
     const [, { projects }] = result[0];
@@ -36,7 +36,7 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       { outputDir: 'custom-out', mode: 'deep' },
-      fakeContext()
+      fakeContext(),
     );
 
     const [, { projects }] = result[0];
@@ -53,10 +53,12 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json', 'libs/bar/package.json'],
       {},
-      fakeContext()
+      fakeContext(),
     );
 
-    const projectRoots = result.flatMap(([, { projects }]) => Object.keys(projects ?? {}));
+    const projectRoots = result.flatMap(([, { projects }]) =>
+      Object.keys(projects ?? {}),
+    );
     expect(projectRoots.sort()).toEqual(['apps/foo', 'libs/bar']);
   });
 
@@ -64,11 +66,11 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['package.json', 'apps/foo/project.json'],
       {},
-      fakeContext()
+      fakeContext(),
     );
 
     const projectsByRoot = Object.fromEntries(
-      result.flatMap(([, { projects }]) => Object.entries(projects ?? {}))
+      result.flatMap(([, { projects }]) => Object.entries(projects ?? {})),
     );
 
     expect(projectsByRoot['.'].targets!['graphify-workspace']).toEqual({
@@ -77,12 +79,16 @@ describe('createNodes', () => {
       outputs: ['{workspaceRoot}/graphify-out'],
       cache: true,
     });
-    expect(projectsByRoot['apps/foo'].targets!['graphify-workspace']).toBeUndefined();
+    expect(
+      projectsByRoot['apps/foo'].targets!['graphify-workspace'],
+    ).toBeUndefined();
   });
 
   it('only emits executor strings that are registered in executors.json', async () => {
     const executorsJsonPath = join(__dirname, '../../executors.json');
-    const executorsJson = JSON.parse(readFileSync(executorsJsonPath, 'utf-8')) as {
+    const executorsJson = JSON.parse(
+      readFileSync(executorsJsonPath, 'utf-8'),
+    ) as {
       executors: Record<string, unknown>;
     };
     const registeredExecutorKeys = Object.keys(executorsJson.executors);
@@ -90,13 +96,13 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['package.json', 'apps/foo/project.json'],
       {},
-      fakeContext()
+      fakeContext(),
     );
 
     const emittedTargets = result.flatMap(([, { projects }]) =>
       Object.values(projects ?? {}).flatMap((project) =>
-        Object.values(project.targets ?? {})
-      )
+        Object.values(project.targets ?? {}),
+      ),
     );
 
     const emittedExecutors = emittedTargets
@@ -116,11 +122,11 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['package.json', 'apps/foo/project.json'],
       {},
-      fakeContext()
+      fakeContext(),
     );
 
     const projectsByRoot = Object.fromEntries(
-      result.flatMap(([, { projects }]) => Object.entries(projects ?? {}))
+      result.flatMap(([, { projects }]) => Object.entries(projects ?? {})),
     );
 
     expect(projectsByRoot['.'].targets!.purge).toEqual({
@@ -137,7 +143,7 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       { outputDir: 'custom-out' },
-      fakeContext()
+      fakeContext(),
     );
 
     const [, { projects }] = result[0];

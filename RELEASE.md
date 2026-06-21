@@ -143,7 +143,7 @@ If versioning fails:
 ## Continuous Integration
 
 `.github/workflows/ci.yml` runs on every push to `master` and on pull
-requests: it lints, tests, builds, and runs e2e for every *affected*
+requests: it lints, tests, builds, and runs e2e for every _affected_
 project, using `nx-set-shas` to compute the diff base. `nx-graphify-e2e`
 declares `@fennet82/nx-graphify` as an implicit dependency, so it's always
 included whenever the plugin changes, not just when the e2e project's own

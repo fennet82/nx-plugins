@@ -40,7 +40,7 @@ describe('graphify executor', () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     await expect(executor(baseOptions, makeContext())).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
     );
     expect(execSync).not.toHaveBeenCalled();
   });

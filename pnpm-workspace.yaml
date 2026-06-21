@@ -1,3 +1,7 @@
 packages:
   - 'packages/*'
   - 'e2e/*'
+allowBuilds:
+  '@swc/core': true
+  nx: true
+  unrs-resolver: true

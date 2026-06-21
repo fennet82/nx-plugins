@@ -41,13 +41,13 @@ This infers:
 
 ## Commands
 
-| Command | What it runs |
-| --- | --- |
-| `nx run <project>:graphify` | `graphify <projectRoot> [flags] --project <project>` |
-| `nx run <root>:graphify-workspace` | `graphify <workspaceRoot> [flags] --project <root>` |
-| `nx run <project>:purge` | `graphify uninstall --project --purge` (cwd = that project's root) |
-| `nx g @fennet82/nx-graphify:init --installAgent=claude` | `graphify install --project --platform claude` |
-| `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude` |
+| Command                                                      | What it runs                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags] --project <project>`               |
+| `nx run <root>:graphify-workspace`                           | `graphify <workspaceRoot> [flags] --project <root>`                |
+| `nx run <project>:purge`                                     | `graphify uninstall --project --purge` (cwd = that project's root) |
+| `nx g @fennet82/nx-graphify:init --installAgent=claude`      | `graphify install --project --platform claude`                     |
+| `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude`                   |
 
 `init` and `uninstall-agents` always run from the workspace root and always
 pass graphify's `--project` flag (graphify's own project-vs-global install

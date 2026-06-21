@@ -22,12 +22,14 @@
 ### Task 1: Simplify `init` generator to pure agent-install passthrough
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/generators/init/generator.ts`
 - Modify: `packages/nx-graphify/src/generators/init/generator.spec.ts`
 - Modify: `packages/nx-graphify/src/generators/init/schema.json`
 - Modify: `packages/nx-graphify/src/generators/init/schema.d.ts`
 
 **Interfaces:**
+
 - Produces: `InitGeneratorSchema { installAgent?: InstallAgent[] }` (from `schema.d.ts`), `InstallAgent` enum unchanged from current `schema.d.ts`. Default export `initGenerator(tree: Tree, options: InitGeneratorSchema): Promise<void>`.
 - Consumes: `checkGraphifyInstalled` from `../../utils/check-graphify` (unchanged).
 
@@ -61,25 +63,19 @@ describe('init generator', () => {
   it('throws when installAgent is not set', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await expect(initGenerator(tree, {})).rejects.toThrow(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
-    );
+    await expect(initGenerator(tree, {})).rejects.toThrow('You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).');
   });
 
   it('throws when installAgent is an empty array', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await expect(initGenerator(tree, { installAgent: [] })).rejects.toThrow(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
-    );
+    await expect(initGenerator(tree, { installAgent: [] })).rejects.toThrow('You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).');
   });
 
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -98,10 +94,7 @@ describe('init generator', () => {
 
     await initGenerator(tree, { installAgent: ['claude', 'cursor', 'codex'] });
 
-    expect(execSync).toHaveBeenCalledWith(
-      'graphify install --platforms claude|cursor|codex',
-      { stdio: 'inherit' }
-    );
+    expect(execSync).toHaveBeenCalledWith('graphify install --platforms claude|cursor|codex', { stdio: 'inherit' });
     expect(execSync).toHaveBeenCalledTimes(1);
   });
 
@@ -120,9 +113,7 @@ describe('init generator', () => {
       throw new Error('command not found');
     });
 
-    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
-      'command not found'
-    );
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow('command not found');
   });
 });
 ```
@@ -142,21 +133,14 @@ import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { InitGeneratorSchema } from './schema';
 
-export default async function initGenerator(
-  tree: Tree,
-  options: InitGeneratorSchema
-) {
+export default async function initGenerator(tree: Tree, options: InitGeneratorSchema) {
   const installAgents = options.installAgent ?? [];
   if (installAgents.length === 0) {
-    throw new Error(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
-    );
+    throw new Error('You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).');
   }
 
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const command = `graphify install --platforms ${installAgents.join('|')}`;
@@ -188,30 +172,7 @@ Replace `packages/nx-graphify/src/generators/init/schema.json`:
       "description": "Run `graphify install --platforms <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--installAgent=claude --installAgent=cursor).",
       "items": {
         "type": "string",
-        "enum": [
-          "claude",
-          "codex",
-          "opencode",
-          "kilo",
-          "aider",
-          "copilot",
-          "claw",
-          "droid",
-          "trae",
-          "trae-cn",
-          "hermes",
-          "kiro",
-          "pi",
-          "codebuddy",
-          "antigravity",
-          "antigravity-windows",
-          "windows",
-          "kimi",
-          "amp",
-          "devin",
-          "gemini",
-          "cursor"
-        ]
+        "enum": ["claude", "codex", "opencode", "kilo", "aider", "copilot", "claw", "droid", "trae", "trae-cn", "hermes", "kiro", "pi", "codebuddy", "antigravity", "antigravity-windows", "windows", "kimi", "amp", "devin", "gemini", "cursor"]
       },
       "default": []
     }
@@ -225,29 +186,7 @@ Replace `packages/nx-graphify/src/generators/init/schema.json`:
 Replace `packages/nx-graphify/src/generators/init/schema.d.ts`:
 
 ```ts
-export type InstallAgent =
-  | 'claude'
-  | 'codex'
-  | 'opencode'
-  | 'kilo'
-  | 'aider'
-  | 'copilot'
-  | 'claw'
-  | 'droid'
-  | 'trae'
-  | 'trae-cn'
-  | 'hermes'
-  | 'kiro'
-  | 'pi'
-  | 'codebuddy'
-  | 'antigravity'
-  | 'antigravity-windows'
-  | 'windows'
-  | 'kimi'
-  | 'amp'
-  | 'devin'
-  | 'gemini'
-  | 'cursor';
+export type InstallAgent = 'claude' | 'codex' | 'opencode' | 'kilo' | 'aider' | 'copilot' | 'claw' | 'droid' | 'trae' | 'trae-cn' | 'hermes' | 'kiro' | 'pi' | 'codebuddy' | 'antigravity' | 'antigravity-windows' | 'windows' | 'kimi' | 'amp' | 'devin' | 'gemini' | 'cursor';
 
 export interface InitGeneratorSchema {
   installAgent?: InstallAgent[];
@@ -282,9 +221,11 @@ EOF
 ### Task 2: Add `GraphifyPluginOptions` type for plugin-level defaults
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/plugin/schema.d.ts`
 
 **Interfaces:**
+
 - Consumes: `GraphifyExecutorSchema` from `../executors/graphify/schema` (existing: `{ outputDir: string } & GraphifyArgsOptions`, where `GraphifyArgsOptions` is `{ mode?, update?, clusterOnly?, noViz?, wiki?, obsidian?, svg?, graphml?, neo4j?, neo4jPush? }` from `../utils/build-args`).
 - Produces: `GraphifyPluginOptions = Partial<GraphifyExecutorSchema>` — consumed by Task 3/4's `plugin/index.ts`.
 
@@ -320,10 +261,12 @@ EOF
 ### Task 3: Implement `createNodes` — per-project `graphify` target inference
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/plugin/index.ts`
 - Create: `packages/nx-graphify/src/plugin/index.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `GraphifyPluginOptions` from `./schema` (Task 2). `CreateNodes`, `CreateNodesContext`, `createNodesFromFiles` from `@nx/devkit` (canonical Nx 23 names — do not use the deprecated `CreateNodesV2`/`CreateNodesContextV2` aliases).
 - Produces: `export const createNodes: CreateNodes<GraphifyPluginOptions>` — a `[glob, fn]` tuple. Also exports `createNodesV2` as an alias of `createNodes` (matches the convention every other Nx-authored plugin in this workspace's own `node_modules` uses, for compatibility with Nx versions/tooling that still look up `createNodesV2` by name). Also exports `resolveGraphifyOptions(pluginOptions?: GraphifyPluginOptions): GraphifyExecutorSchema` as a named export so Task 5 (workspace-root target) can reuse it without duplicating the default-resolution logic.
 
@@ -350,11 +293,7 @@ describe('createNodes', () => {
   const [, createNodesFunction] = createNodes;
 
   it('attaches a graphify target to a matched project with default options', async () => {
-    const result = await createNodesFunction(
-      ['apps/foo/project.json'],
-      {},
-      fakeContext()
-    );
+    const result = await createNodesFunction(['apps/foo/project.json'], {}, fakeContext());
 
     const [, { projects }] = result[0];
     expect(projects['apps/foo'].targets.graphify).toEqual({
@@ -367,28 +306,18 @@ describe('createNodes', () => {
   });
 
   it('applies plugin-level option overrides from nx.json', async () => {
-    const result = await createNodesFunction(
-      ['apps/foo/project.json'],
-      { outputDir: 'custom-out', mode: 'deep' },
-      fakeContext()
-    );
+    const result = await createNodesFunction(['apps/foo/project.json'], { outputDir: 'custom-out', mode: 'deep' }, fakeContext());
 
     const [, { projects }] = result[0];
     expect(projects['apps/foo'].targets.graphify.options).toEqual({
       outputDir: 'custom-out',
       mode: 'deep',
     });
-    expect(projects['apps/foo'].targets.graphify.outputs).toEqual([
-      '{projectRoot}/custom-out',
-    ]);
+    expect(projects['apps/foo'].targets.graphify.outputs).toEqual(['{projectRoot}/custom-out']);
   });
 
   it('attaches a target for every matched project independently', async () => {
-    const result = await createNodesFunction(
-      ['apps/foo/project.json', 'libs/bar/package.json'],
-      {},
-      fakeContext()
-    );
+    const result = await createNodesFunction(['apps/foo/project.json', 'libs/bar/package.json'], {}, fakeContext());
 
     const projectRoots = result.flatMap(([, { projects }]) => Object.keys(projects));
     expect(projectRoots.sort()).toEqual(['apps/foo', 'libs/bar']);
@@ -414,9 +343,7 @@ import type { GraphifyPluginOptions } from './schema';
 
 const GRAPHIFY_CONFIG_GLOB = '{**/project.json,**/package.json}';
 
-export function resolveGraphifyOptions(
-  pluginOptions: GraphifyPluginOptions = {}
-): GraphifyExecutorSchema {
+export function resolveGraphifyOptions(pluginOptions: GraphifyPluginOptions = {}): GraphifyExecutorSchema {
   return {
     outputDir: pluginOptions.outputDir ?? 'graphify-out',
     mode: pluginOptions.mode ?? 'normal',
@@ -460,7 +387,7 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
       },
       configFiles,
       options,
-      context
+      context,
     );
   },
 ];
@@ -495,10 +422,12 @@ EOF
 ### Task 4: Add workspace-root `graphify-workspace` target inference
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/plugin/index.ts`
 - Modify: `packages/nx-graphify/src/plugin/index.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `resolveGraphifyOptions` (Task 3, same file — no new import).
 - Produces: no new exports; `createNodes`'s returned project node for `projectRoot === '.'` now additionally includes a `graphify-workspace` target. Nothing outside this file depends on the new target shape directly.
 
@@ -507,25 +436,19 @@ EOF
 Add to `packages/nx-graphify/src/plugin/index.spec.ts` (inside the existing `describe('createNodes', ...)` block):
 
 ```ts
-  it('attaches graphify-workspace only at the workspace root', async () => {
-    const result = await createNodesFunction(
-      ['package.json', 'apps/foo/project.json'],
-      {},
-      fakeContext()
-    );
+it('attaches graphify-workspace only at the workspace root', async () => {
+  const result = await createNodesFunction(['package.json', 'apps/foo/project.json'], {}, fakeContext());
 
-    const projectsByRoot = Object.fromEntries(
-      result.flatMap(([, { projects }]) => Object.entries(projects))
-    );
+  const projectsByRoot = Object.fromEntries(result.flatMap(([, { projects }]) => Object.entries(projects)));
 
-    expect(projectsByRoot['.'].targets['graphify-workspace']).toEqual({
-      executor: 'nx-graphify:graphify-workspace',
-      options: { outputDir: 'graphify-out', mode: 'normal' },
-      outputs: ['{workspaceRoot}/graphify-out'],
-      cache: true,
-    });
-    expect(projectsByRoot['apps/foo'].targets['graphify-workspace']).toBeUndefined();
+  expect(projectsByRoot['.'].targets['graphify-workspace']).toEqual({
+    executor: 'nx-graphify:graphify-workspace',
+    options: { outputDir: 'graphify-out', mode: 'normal' },
+    outputs: ['{workspaceRoot}/graphify-out'],
+    cache: true,
   });
+  expect(projectsByRoot['apps/foo'].targets['graphify-workspace']).toBeUndefined();
+});
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -596,10 +519,12 @@ EOF
 ### Task 5: Wire up package.json plugin export and clean up executors.json
 
 **Files:**
+
 - Modify: `packages/nx-graphify/package.json`
 - Modify: `packages/nx-graphify/executors.json`
 
 **Interfaces:**
+
 - Produces: a resolvable `nx-graphify/plugin` subpath import, pointing at the compiled `dist/plugin/index.js` from Task 3/4 — this is the exact string consumers put in their `nx.json`'s `plugins: [{ "plugin": "nx-graphify/plugin", ... }]`.
 
 - [ ] **Step 1: Add the `./plugin` export to package.json**
@@ -673,16 +598,18 @@ EOF
 ### Task 6: Update README for the inferred-tasks workflow
 
 **Files:**
+
 - Modify: `packages/nx-graphify/README.md`
 
 **Interfaces:**
+
 - None — documentation only.
 
 - [ ] **Step 1: Replace the "Setup" and agent-install sections**
 
 In `packages/nx-graphify/README.md`, replace everything from `## Setup` through the end of the "AI coding assistant skills" subsection with:
 
-```markdown
+````markdown
 ## Setup
 
 Register the plugin in your workspace's `nx.json`:
@@ -700,6 +627,7 @@ Register the plugin in your workspace's `nx.json`:
   ]
 }
 ```
+````
 
 That's it — every project automatically gets a `graphify` target, and the
 workspace root automatically gets a `graphify-workspace` target. No
@@ -721,7 +649,8 @@ nx g nx-graphify:init --installAgent=claude --installAgent=cursor
 This runs `graphify install --platforms claude|cursor` for you. It's a
 one-time, workspace-root-level operation, unrelated to which projects have
 a `graphify` target.
-```
+
+````
 
 - [ ] **Step 2: Update the "Targets" section to describe automatic attachment**
 
@@ -733,7 +662,7 @@ Replace the `## Targets` section's `graphify-workspace` subsection:
 Automatically attached to the workspace root once the plugin is registered
 in `nx.json` (see Setup). Runs Graphify against the entire workspace from
 `context.root`.
-```
+````
 
 (Leave the `### \`graphify\` (per project)` subsection as-is — its description of what running the target does is unaffected by how the target gets attached.)
 

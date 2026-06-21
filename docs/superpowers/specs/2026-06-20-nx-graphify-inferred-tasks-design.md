@@ -12,7 +12,7 @@ a pure passthrough for `graphify install --platforms <agents>`.
 This supersedes the project-scaffolding portion of
 `docs/superpowers/specs/2026-06-18-nx-graphify-design.md`. The two executors
 (`graphify`, `graphify-workspace`) and their schemas/logic are unchanged by
-this redesign — only *how their target gets attached to a project* changes.
+this redesign — only _how their target gets attached to a project_ changes.
 
 ## Motivation
 
@@ -55,7 +55,7 @@ registered by consumers in their own `nx.json`:
 - For every matched file, the function returns a `graphify` target on that
   project (see Defaults & Caching below).
 - When the matched file's directory is the workspace root (`projectRoot ===
-  '.'`), the function additionally attaches a `graphify-workspace` target
+'.'`), the function additionally attaches a `graphify-workspace` target
   there. If the workspace root has neither a `project.json` nor a
   `package.json`, `graphify-workspace` is not inferred — an edge case, but
   one that already requires a `package.json` for nearly every real Nx
@@ -150,15 +150,11 @@ fallback path:
 export default async function initGenerator(tree: Tree, options: InitGeneratorSchema) {
   const installAgents = options.installAgent ?? [];
   if (installAgents.length === 0) {
-    throw new Error(
-      'You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).'
-    );
+    throw new Error('You must specify at least one --installAgent (e.g. --installAgent=claude --installAgent=cursor).');
   }
 
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const command = `graphify install --platforms ${installAgents.join('|')}`;
@@ -209,7 +205,7 @@ deleted outright rather than deprecated.
 ## Out of scope (unchanged from original design)
 
 - `--watch`, `--mcp`, `graphify hook install/uninstall`, `/graphify add
-  <url>`, `/graphify query/explain/path` — still out of scope, unaffected by
+<url>`, `/graphify query/explain/path` — still out of scope, unaffected by
   this redesign.
 - Publishing checklist (`nx release`, npm publish, `nx list` registry
   submission) — still deferred, not part of this pass.

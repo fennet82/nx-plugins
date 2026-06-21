@@ -6,7 +6,14 @@ import {
   tmpProjPath,
   updateFile,
 } from '@nx/plugin/testing';
-import { chmodSync, cpSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'fs';
+import {
+  chmodSync,
+  cpSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -26,10 +33,15 @@ describe('nx-graphify', () => {
     // tsconfig this scratch workspace doesn't have. Replacing the symlink
     // with a real copy keeps the realpath inside node_modules, so Nx loads
     // the already-built dist/*.js files like a normal installed package.
-    const pluginNodeModulesPath = tmpProjPath('node_modules/@fennet82/nx-graphify');
+    const pluginNodeModulesPath = tmpProjPath(
+      'node_modules/@fennet82/nx-graphify',
+    );
     const realPluginPath = realpathSync(pluginNodeModulesPath);
     rmSync(pluginNodeModulesPath, { recursive: true, force: true });
-    cpSync(realPluginPath, pluginNodeModulesPath, { recursive: true, dereference: true });
+    cpSync(realPluginPath, pluginNodeModulesPath, {
+      recursive: true,
+      dereference: true,
+    });
 
     updateFile('nx.json', (content) => {
       const json = JSON.parse(content);
@@ -77,15 +89,23 @@ describe('nx-graphify', () => {
   });
 
   it('runs `graphify install --project --platform <agent>` via the init generator', async () => {
-    await runNxCommandAsync('g @fennet82/nx-graphify:init --installAgent=claude');
+    await runNxCommandAsync(
+      'g @fennet82/nx-graphify:init --installAgent=claude',
+    );
 
-    expect(readFile(graphifyLogFile)).toContain('install --project --platform claude');
+    expect(readFile(graphifyLogFile)).toContain(
+      'install --project --platform claude',
+    );
   });
 
   it('runs `graphify uninstall --project --platform <agent>` via the uninstall-agents generator', async () => {
-    await runNxCommandAsync('g @fennet82/nx-graphify:uninstall-agents --agent=claude');
+    await runNxCommandAsync(
+      'g @fennet82/nx-graphify:uninstall-agents --agent=claude',
+    );
 
-    expect(readFile(graphifyLogFile)).toContain('uninstall --project --platform claude');
+    expect(readFile(graphifyLogFile)).toContain(
+      'uninstall --project --platform claude',
+    );
   });
 
   it('runs `graphify uninstall --project --purge` via the inferred purge target', async () => {

@@ -140,7 +140,7 @@ describe('buildGraphifyArgs', () => {
     const options: GraphifyArgsOptions = { provider: { model: 'gpt-4' } };
 
     expect(() => buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toThrow(
-      'provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).'
+      'provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).',
     );
   });
 });

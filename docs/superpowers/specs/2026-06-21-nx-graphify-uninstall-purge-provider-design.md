@@ -35,7 +35,7 @@ agent-uninstall commands always run from the workspace root and always pass
 is never what this plugin should do on a user's behalf.
 
 This is unrelated to the existing `--project <name>` flag in
-`buildGraphifyArgs` (`src/utils/build-args.ts`), which is a *different*,
+`buildGraphifyArgs` (`src/utils/build-args.ts`), which is a _different_,
 value-taking flag used by the `graphify`/`graphify-workspace` extraction
 executors to identify which project is being extracted. Both flags happen to
 be spelled `--project` but belong to different `graphify` subcommands
@@ -50,9 +50,7 @@ Unconditionally appends `--project`:
 ```ts
 const installAgents = options.installAgent ?? [];
 if (options.installAgent && options.installAgent.length === 0) {
-  logger.warn(
-    "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).",
-  );
+  logger.warn("You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).");
 }
 const command = `graphify install --project --platforms ${installAgents.join('|')}`;
 ```
@@ -78,21 +76,14 @@ workspace root):
   exposed by this plugin).
 
 ```ts
-export default async function uninstallAgentsGenerator(
-  tree: Tree,
-  options: UninstallAgentsGeneratorSchema,
-) {
+export default async function uninstallAgentsGenerator(tree: Tree, options: UninstallAgentsGeneratorSchema) {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const agents = options.agent ?? [];
   if (agents.length === 0) {
-    throw new Error(
-      'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).',
-    );
+    throw new Error('You must specify at least one --agent (e.g. --agent=claude --agent=cursor).');
   }
 
   const command = `graphify uninstall --project --platform ${agents.join('|')}`;
@@ -122,14 +113,9 @@ a new pattern, just extended to a second generator).
 New executor at `src/executors/purge/`:
 
 ```ts
-const runExecutor: PromiseExecutor<PurgeExecutorSchema> = async (
-  options,
-  context: ExecutorContext,
-) => {
+const runExecutor: PromiseExecutor<PurgeExecutorSchema> = async (options, context: ExecutorContext) => {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const projectName = context.projectName as string;
@@ -202,16 +188,7 @@ every other extraction flag) and to `resolveGraphifyOptions` in
 `nx.json`, same resolution order as `mode`/`outputDir`/etc.).
 
 ```ts
-export type ProviderBackend =
-  | 'azure'
-  | 'bedrock'
-  | 'claude'
-  | 'claude-cli'
-  | 'deepseek'
-  | 'gemini'
-  | 'kimi'
-  | 'ollama'
-  | 'openai';
+export type ProviderBackend = 'azure' | 'bedrock' | 'claude' | 'claude-cli' | 'deepseek' | 'gemini' | 'kimi' | 'ollama' | 'openai';
 
 export interface GraphifyArgsOptions {
   // ...existing fields unchanged...
@@ -227,9 +204,7 @@ appended after the existing flags, before the trailing `--project <name>`:
 
 ```ts
 if (options.provider?.model && !options.provider?.backend) {
-  throw new Error(
-    'provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).',
-  );
+  throw new Error('provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).');
 }
 if (options.provider?.backend) {
   args.push('--backend', options.provider.backend);
@@ -293,9 +268,9 @@ root `package.json`, `.verdaccio/config.yml`):
    assert exact CLI invocations without depending on the real `graphify`
    CLI being installed in CI.
 4. Exercise: `nx g nx-graphify:init --installAgent=claude`, `nx g
-   nx-graphify:uninstall-agents --agent=claude`, `nx run <proj>:purge`, and
+nx-graphify:uninstall-agents --agent=claude`, `nx run <proj>:purge`, and
    one `nx run <proj>:graphify --provider.backend=openai
-   --provider.model=gpt-4` (or equivalent options-file invocation) —
+--provider.model=gpt-4` (or equivalent options-file invocation) —
    asserting the fake `graphify` log file recorded the expected argv for
    each.
 5. Teardown: stop the local registry, remove the temp workspace.
@@ -309,7 +284,7 @@ root `package.json`, `.verdaccio/config.yml`):
   `graphify` doesn't support this yet; the option is left commented out for
   future use (see `purge` executor above).
 - `--watch`, `--mcp`, `graphify hook install/uninstall`, `/graphify add
-  <url>`, `/graphify query/explain/path` — still out of scope, unchanged
+<url>`, `/graphify query/explain/path` — still out of scope, unchanged
   from prior specs.
 - Publishing checklist (`nx release`, npm publish, `nx list` registry
   submission) — still deferred.

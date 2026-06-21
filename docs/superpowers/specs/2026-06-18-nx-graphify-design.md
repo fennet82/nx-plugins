@@ -65,7 +65,7 @@ Nx project.
 ### Schema options
 
 | Option      | Type    | Default        | Description                                   |
-|-------------|---------|----------------|-----------------------------------------------|
+| ----------- | ------- | -------------- | --------------------------------------------- |
 | outputDir   | string  | "graphify-out" | Where outputs are written                     |
 | mode        | enum    | "normal"       | "normal" or "deep"                            |
 | update      | boolean | false          | Re-extract changed files only, merge graph    |
@@ -112,9 +112,9 @@ project root, and passes `'workspace'` as the project-name argument to
 
 ### Schema options
 
-| Option       | Type    | Default   | Description                                  |
-|--------------|---------|-----------|-----------------------------------------------|
-| project      | string  | undefined | Specific project to add the target to        |
+| Option       | Type    | Default   | Description                                   |
+| ------------ | ------- | --------- | --------------------------------------------- |
+| project      | string  | undefined | Specific project to add the target to         |
 | all          | boolean | false     | Add target to all projects                    |
 | installAgent | string  | "none"    | Run `graphify <agent> install` for an AI tool |
 
@@ -175,11 +175,7 @@ point to the install docs link above.
 Pure function, fully unit-testable, no side effects.
 
 ```ts
-export function buildGraphifyArgs(
-  options: GraphifyExecutorSchema,
-  targetPath: string,
-  projectName: string
-): string[] {
+export function buildGraphifyArgs(options: GraphifyExecutorSchema, targetPath: string, projectName: string): string[] {
   const args: string[] = [targetPath];
   if (options.mode === 'deep') args.push('--mode', 'deep');
   if (options.update) args.push('--update');
@@ -202,6 +198,7 @@ the constant `'workspace'`.
 ## Testing scope (this pass)
 
 Unit tests included now:
+
 - `build-args.spec.ts`: every flag combination, default omissions,
   `--project` always appended.
 - `check-graphify.spec.ts`: mocked `execSync` for installed/not-installed.

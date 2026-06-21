@@ -12,7 +12,9 @@ vi.mock('../../utils/check-graphify', () => ({
   checkGraphifyInstalled: vi.fn(),
 }));
 
-const baseOptions: GraphifyWorkspaceExecutorSchema = { outputDir: 'graphify-out' };
+const baseOptions: GraphifyWorkspaceExecutorSchema = {
+  outputDir: 'graphify-out',
+};
 
 function makeContext(): ExecutorContext {
   return {
@@ -34,7 +36,7 @@ describe('graphify-workspace executor', () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     await expect(executor(baseOptions, makeContext())).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
     );
     expect(execSync).not.toHaveBeenCalled();
   });
@@ -46,10 +48,13 @@ describe('graphify-workspace executor', () => {
     const result = await executor(baseOptions, makeContext());
 
     expect(result).toEqual({ success: true });
-    expect(execSync).toHaveBeenCalledWith('graphify /repo --project workspace', {
-      stdio: 'inherit',
-      cwd: '/repo',
-    });
+    expect(execSync).toHaveBeenCalledWith(
+      'graphify /repo --project workspace',
+      {
+        stdio: 'inherit',
+        cwd: '/repo',
+      },
+    );
   });
 
   it('returns success: false when execSync throws', async () => {

@@ -16,7 +16,8 @@ const runExecutor: PromiseExecutor<PurgeExecutorSchema> = async (
 
   const projectName = context.projectName as string;
   const projectRoot = context.projectsConfigurations.projects[projectName].root;
-  const cwd = projectRoot === '.' ? context.root : `${context.root}/${projectRoot}`;
+  const cwd =
+    projectRoot === '.' ? context.root : `${context.root}/${projectRoot}`;
 
   // graphify does not yet support a custom output directory for `uninstall --purge`
   // (it always purges its hard-coded `graphify-out`). `options.outputDir` is kept

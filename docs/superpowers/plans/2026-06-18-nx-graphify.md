@@ -17,6 +17,7 @@
 `create-nx-workspace` refuses to scaffold into a non-empty directory, and this repo already has `.git` and `docs/`. Scaffold into a temp directory, then move the generated files in (excluding `.git`).
 
 **Files:**
+
 - Create (via tool, not by hand): `package.json`, `nx.json`, `tsconfig.json`, `tsconfig.base.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `vitest.config.ts`, `eslint.config.mjs`, `.prettierrc`, `.prettierignore`, `.vscode/extensions.json`, `.verdaccio/config.yml`, `README.md` at repo root
 - Remove after move: `CLAUDE.md`, `AGENTS.md`, `opencode.json`, `.opencode/`, `.gemini/`, `.cursor/`, `.codex/`, `.claude/`, `.agents/`, `packages/utils/`, `packages/strings/`, `packages/colors/`, `packages/async/` (template's AI-agent boilerplate and sample libs — not needed for this plugin)
 
@@ -98,6 +99,7 @@ git commit -m "Scaffold Nx/pnpm workspace for nx-graphify"
 ## Task 2: Generate the `nx-graphify` package skeleton
 
 **Files:**
+
 - Modify: root `package.json` (adds `@nx/plugin` devDependency, `@nx/devkit` becomes available)
 - Create: `packages/nx-graphify/package.json`, `tsconfig.json`, `tsconfig.lib.json`, `src/index.ts`, `README.md`
 - Modify: root `tsconfig.json` (adds reference), root `nx.json` (release projects)
@@ -115,6 +117,7 @@ npx nx g @nx/plugin:plugin packages/nx-graphify --publishable --importPath=nx-gr
 ```
 
 Expected output includes:
+
 ```
 CREATE packages/nx-graphify/tsconfig.lib.json
 CREATE packages/nx-graphify/tsconfig.json
@@ -146,6 +149,7 @@ git commit -m "Generate nx-graphify plugin package skeleton"
 ## Task 3: `utils/check-graphify.ts`
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/utils/check-graphify.ts`
 - Create: `packages/nx-graphify/src/utils/check-graphify.spec.ts`
 - Create: `packages/nx-graphify/vite.config.ts` (enables Vitest for this package, modeled on the deleted `packages/async/vite.config.ts`)
@@ -188,12 +192,7 @@ Create `packages/nx-graphify/tsconfig.spec.json`:
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "vite.config.ts",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.d.ts"
-  ],
+  "include": ["vite.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.lib.json" }]
 }
 ```
@@ -205,10 +204,7 @@ Edit `packages/nx-graphify/tsconfig.json` to add the spec reference:
   "extends": "../../tsconfig.base.json",
   "files": [],
   "include": [],
-  "references": [
-    { "path": "./tsconfig.lib.json" },
-    { "path": "./tsconfig.spec.json" }
-  ]
+  "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.spec.json" }]
 }
 ```
 
@@ -294,6 +290,7 @@ git commit -m "Add checkGraphifyInstalled utility"
 ## Task 4: `utils/build-args.ts`
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/utils/build-args.ts`
 - Create: `packages/nx-graphify/src/utils/build-args.spec.ts`
 
@@ -309,33 +306,19 @@ describe('buildGraphifyArgs', () => {
   it('returns just the target path and --project for default options', () => {
     const options: GraphifyArgsOptions = {};
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--project', 'foo']);
   });
 
   it('adds --mode deep when mode is "deep"', () => {
     const options: GraphifyArgsOptions = { mode: 'deep' };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--mode',
-      'deep',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--mode', 'deep', '--project', 'foo']);
   });
 
   it('omits --mode when mode is "normal"', () => {
     const options: GraphifyArgsOptions = { mode: 'normal' };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--project', 'foo']);
   });
 
   it('adds every boolean flag when set', () => {
@@ -350,31 +333,13 @@ describe('buildGraphifyArgs', () => {
       neo4j: true,
     };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--update',
-      '--cluster-only',
-      '--no-viz',
-      '--wiki',
-      '--obsidian',
-      '--svg',
-      '--graphml',
-      '--neo4j',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--update', '--cluster-only', '--no-viz', '--wiki', '--obsidian', '--svg', '--graphml', '--neo4j', '--project', 'foo']);
   });
 
   it('adds --neo4j-push with its value when set', () => {
     const options: GraphifyArgsOptions = { neo4jPush: 'bolt://localhost:7687' };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--neo4j-push',
-      'bolt://localhost:7687',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--neo4j-push', 'bolt://localhost:7687', '--project', 'foo']);
   });
 
   it('omits boolean flags that are false', () => {
@@ -389,19 +354,11 @@ describe('buildGraphifyArgs', () => {
       neo4j: false,
     };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--project',
-      'foo',
-    ]);
+    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--project', 'foo']);
   });
 
   it('always appends --project last, using the workspace constant for graphify-workspace', () => {
-    expect(buildGraphifyArgs({}, '/repo', 'workspace')).toEqual([
-      '/repo',
-      '--project',
-      'workspace',
-    ]);
+    expect(buildGraphifyArgs({}, '/repo', 'workspace')).toEqual(['/repo', '--project', 'workspace']);
   });
 });
 ```
@@ -432,11 +389,7 @@ export interface GraphifyArgsOptions {
   neo4jPush?: string;
 }
 
-export function buildGraphifyArgs(
-  options: GraphifyArgsOptions,
-  targetPath: string,
-  projectName: string
-): string[] {
+export function buildGraphifyArgs(options: GraphifyArgsOptions, targetPath: string, projectName: string): string[] {
   const args: string[] = [targetPath];
   if (options.mode === 'deep') args.push('--mode', 'deep');
   if (options.update) args.push('--update');
@@ -473,6 +426,7 @@ git commit -m "Add buildGraphifyArgs utility"
 ## Task 5: `executors/graphify`
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/executors/graphify/schema.json`
 - Create: `packages/nx-graphify/src/executors/graphify/schema.d.ts`
 - Create: `packages/nx-graphify/src/executors/graphify/executor.ts`
@@ -606,9 +560,7 @@ describe('graphify executor', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(executor(baseOptions, makeContext())).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(executor(baseOptions, makeContext())).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -658,14 +610,9 @@ import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import { buildGraphifyArgs } from '../../utils/build-args';
 import type { GraphifyExecutorSchema } from './schema';
 
-const runExecutor: PromiseExecutor<GraphifyExecutorSchema> = async (
-  options,
-  context: ExecutorContext
-) => {
+const runExecutor: PromiseExecutor<GraphifyExecutorSchema> = async (options, context: ExecutorContext) => {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const projectName = context.projectName as string;
@@ -707,6 +654,7 @@ git commit -m "Add graphify executor"
 ## Task 6: `executors/graphify-workspace`
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/executors/graphify-workspace/schema.json`
 - Create: `packages/nx-graphify/src/executors/graphify-workspace/schema.d.ts`
 - Create: `packages/nx-graphify/src/executors/graphify-workspace/executor.ts`
@@ -834,9 +782,7 @@ describe('graphify-workspace executor', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(executor(baseOptions, makeContext())).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(executor(baseOptions, makeContext())).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -886,14 +832,9 @@ import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import { buildGraphifyArgs } from '../../utils/build-args';
 import type { GraphifyWorkspaceExecutorSchema } from './schema';
 
-const runExecutor: PromiseExecutor<GraphifyWorkspaceExecutorSchema> = async (
-  options,
-  context: ExecutorContext
-) => {
+const runExecutor: PromiseExecutor<GraphifyWorkspaceExecutorSchema> = async (options, context: ExecutorContext) => {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const args = buildGraphifyArgs(options, context.root, 'workspace');
@@ -933,6 +874,7 @@ git commit -m "Add graphify-workspace executor"
 ## Task 7: Wire up `executors.json` and `package.json`
 
 **Files:**
+
 - Create: `packages/nx-graphify/executors.json`
 - Modify: `packages/nx-graphify/package.json`
 
@@ -1000,6 +942,7 @@ git commit -m "Wire up executors.json"
 ## Task 8: `generators/init`
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/generators/init/schema.json`
 - Create: `packages/nx-graphify/src/generators/init/schema.d.ts`
 - Create: `packages/nx-graphify/src/generators/init/generator.ts`
@@ -1028,31 +971,7 @@ Create `packages/nx-graphify/src/generators/init/schema.json`:
     "installAgent": {
       "type": "string",
       "description": "Optionally run `graphify <agent> install` for your AI coding assistant",
-      "enum": [
-        "none",
-        "claude",
-        "codex",
-        "opencode",
-        "kilo",
-        "aider",
-        "copilot",
-        "claw",
-        "droid",
-        "trae",
-        "trae-cn",
-        "hermes",
-        "kiro",
-        "pi",
-        "codebuddy",
-        "antigravity",
-        "antigravity-windows",
-        "windows",
-        "kimi",
-        "amp",
-        "devin",
-        "gemini",
-        "cursor"
-      ],
+      "enum": ["none", "claude", "codex", "opencode", "kilo", "aider", "copilot", "claw", "droid", "trae", "trae-cn", "hermes", "kiro", "pi", "codebuddy", "antigravity", "antigravity-windows", "windows", "kimi", "amp", "devin", "gemini", "cursor"],
       "default": "none"
     }
   },
@@ -1063,30 +982,7 @@ Create `packages/nx-graphify/src/generators/init/schema.json`:
 Create `packages/nx-graphify/src/generators/init/schema.d.ts`:
 
 ```ts
-export type InstallAgent =
-  | 'none'
-  | 'claude'
-  | 'codex'
-  | 'opencode'
-  | 'kilo'
-  | 'aider'
-  | 'copilot'
-  | 'claw'
-  | 'droid'
-  | 'trae'
-  | 'trae-cn'
-  | 'hermes'
-  | 'kiro'
-  | 'pi'
-  | 'codebuddy'
-  | 'antigravity'
-  | 'antigravity-windows'
-  | 'windows'
-  | 'kimi'
-  | 'amp'
-  | 'devin'
-  | 'gemini'
-  | 'cursor';
+export type InstallAgent = 'none' | 'claude' | 'codex' | 'opencode' | 'kilo' | 'aider' | 'copilot' | 'claw' | 'droid' | 'trae' | 'trae-cn' | 'hermes' | 'kiro' | 'pi' | 'codebuddy' | 'antigravity' | 'antigravity-windows' | 'windows' | 'kimi' | 'amp' | 'devin' | 'gemini' | 'cursor';
 
 export interface InitGeneratorSchema {
   project?: string;
@@ -1127,9 +1023,7 @@ describe('init generator', () => {
   it('throws when neither project nor all is set', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await expect(initGenerator(tree, {})).rejects.toThrow(
-      'You must specify either --project=<name> or --all to add the graphify target.'
-    );
+    await expect(initGenerator(tree, {})).rejects.toThrow('You must specify either --project=<name> or --all to add the graphify target.');
   });
 
   it('adds the graphify target to the specified project only', async () => {
@@ -1162,11 +1056,7 @@ describe('init generator', () => {
 
     await initGenerator(tree, { project: 'foo' });
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-      )
-    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'));
     expect(readProjectConfiguration(tree, 'foo').targets?.graphify).toBeDefined();
   });
 
@@ -1187,11 +1077,7 @@ describe('init generator', () => {
     await initGenerator(tree, { project: 'foo', installAgent: 'claude' });
 
     expect(execSync).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Skipping agent installation — graphify must be installed first. Run `graphify claude install` manually after installing graphify.'
-      )
-    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Skipping agent installation — graphify must be installed first. Run `graphify claude install` manually after installing graphify.'));
   });
 
   it('does not run agent installation when installAgent is "none"', async () => {
@@ -1217,40 +1103,23 @@ Expected: FAIL — `Cannot find module './generator'`.
 Create `packages/nx-graphify/src/generators/init/generator.ts`:
 
 ```ts
-import {
-  formatFiles,
-  getProjects,
-  logger,
-  updateProjectConfiguration,
-  type Tree,
-} from '@nx/devkit';
+import { formatFiles, getProjects, logger, updateProjectConfiguration, type Tree } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { InitGeneratorSchema } from './schema';
 
-export default async function initGenerator(
-  tree: Tree,
-  options: InitGeneratorSchema
-) {
+export default async function initGenerator(tree: Tree, options: InitGeneratorSchema) {
   if (!options.project && !options.all) {
-    throw new Error(
-      'You must specify either --project=<name> or --all to add the graphify target.'
-    );
+    throw new Error('You must specify either --project=<name> or --all to add the graphify target.');
   }
 
   const graphifyInstalled = checkGraphifyInstalled();
   if (!graphifyInstalled) {
-    logger.warn(
-      'graphify CLI not found. See installation instructions at: ' +
-        'https://github.com/safishamsi/graphify#install\n' +
-        'Targets have been scaffolded and will work once graphify is installed.'
-    );
+    logger.warn('graphify CLI not found. See installation instructions at: ' + 'https://github.com/safishamsi/graphify#install\n' + 'Targets have been scaffolded and will work once graphify is installed.');
   }
 
   const projects = getProjects(tree);
-  const targetProjectNames = options.all
-    ? Array.from(projects.keys())
-    : [options.project as string];
+  const targetProjectNames = options.all ? Array.from(projects.keys()) : [options.project as string];
 
   for (const projectName of targetProjectNames) {
     const config = projects.get(projectName);
@@ -1275,10 +1144,7 @@ export default async function initGenerator(
   const installAgent = options.installAgent ?? 'none';
   if (installAgent !== 'none') {
     if (!graphifyInstalled) {
-      logger.warn(
-        `Skipping agent installation — graphify must be installed first. ` +
-          `Run \`graphify ${installAgent} install\` manually after installing graphify.`
-      );
+      logger.warn(`Skipping agent installation — graphify must be installed first. ` + `Run \`graphify ${installAgent} install\` manually after installing graphify.`);
     } else {
       const command = `graphify ${installAgent} install`;
       logger.info(`Running: ${command}`);
@@ -1288,10 +1154,7 @@ export default async function initGenerator(
 
   await formatFiles(tree);
 
-  logger.info(
-    `nx-graphify: added the "graphify" target to: ${targetProjectNames.join(', ')}` +
-      (installAgent !== 'none' ? `\nConfigured AI assistant: ${installAgent}` : '')
-  );
+  logger.info(`nx-graphify: added the "graphify" target to: ${targetProjectNames.join(', ')}` + (installAgent !== 'none' ? `\nConfigured AI assistant: ${installAgent}` : ''));
 }
 ```
 
@@ -1315,6 +1178,7 @@ git commit -m "Add init generator"
 ## Task 9: Wire up `generators.json` and finalize `package.json`
 
 **Files:**
+
 - Create: `packages/nx-graphify/generators.json`
 - Modify: `packages/nx-graphify/package.json`
 
@@ -1360,12 +1224,7 @@ Edit `packages/nx-graphify/package.json` to its final form (merging in the new f
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "!**/*.tsbuildinfo",
-    "executors.json",
-    "generators.json"
-  ],
+  "files": ["dist", "!**/*.tsbuildinfo", "executors.json", "generators.json"],
   "nx": {
     "targets": {
       "build": {
@@ -1435,13 +1294,14 @@ git commit -m "Wire up generators.json and finalize package.json"
 ## Task 10: README and final workspace verification
 
 **Files:**
+
 - Modify: `packages/nx-graphify/README.md`
 
 - [ ] **Step 1: Write the package README**
 
 Replace the contents of `packages/nx-graphify/README.md`:
 
-```markdown
+````markdown
 # nx-graphify
 
 Nx plugin for [Graphify](https://graphify.net/) — build multi-modal knowledge
@@ -1455,6 +1315,7 @@ Graphify must be installed separately:
 ```bash
 pip install graphifyy
 ```
+````
 
 See https://github.com/safishamsi/graphify#install for full installation
 instructions.
@@ -1494,26 +1355,27 @@ executor, to build a single knowledge graph across the entire repo.
 
 ## Options
 
-| Option        | Type    | Default        | Description                                    |
-|---------------|---------|----------------|-------------------------------------------------|
-| `outputDir`   | string  | `graphify-out` | Where outputs are written                        |
-| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)   |
-| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph  |
-| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction           |
-| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only    |
-| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community    |
-| `obsidian`    | boolean | `false`        | Export an Obsidian vault                         |
-| `svg`         | boolean | `false`        | Export `graph.svg`                               |
-| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                |
-| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                             |
-| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j           |
-```
+| Option        | Type    | Default        | Description                                     |
+| ------------- | ------- | -------------- | ----------------------------------------------- |
+| `outputDir`   | string  | `graphify-out` | Where outputs are written                       |
+| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)  |
+| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph |
+| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction          |
+| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only   |
+| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community   |
+| `obsidian`    | boolean | `false`        | Export an Obsidian vault                        |
+| `svg`         | boolean | `false`        | Export `graph.svg`                              |
+| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)              |
+| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                           |
+| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j         |
+
+````
 
 - [ ] **Step 2: Run the entire workspace's checks**
 
 ```bash
 npx nx run-many -t build,test
-```
+````
 
 Expected: `Successfully ran target build, test for project nx-graphify` (and any other project) with no failures.
 

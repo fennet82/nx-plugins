@@ -106,19 +106,19 @@ touched. Not cached, since deleting output isn't a reproducible build step.
 
 ## Options
 
-| Option        | Type    | Default        | Description                                    |
-|---------------|---------|----------------|-------------------------------------------------|
-| `outputDir`   | string  | `graphify-out` | Where outputs are written                        |
-| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)   |
-| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph  |
-| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction           |
-| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only    |
-| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community    |
-| `obsidian`    | boolean | `false`        | Export an Obsidian vault                         |
-| `svg`         | boolean | `false`        | Export `graph.svg`                               |
-| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                |
-| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                             |
-| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j           |
+| Option        | Type    | Default        | Description                                                 |
+| ------------- | ------- | -------------- | ----------------------------------------------------------- |
+| `outputDir`   | string  | `graphify-out` | Where outputs are written                                   |
+| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)              |
+| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph             |
+| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction                      |
+| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only               |
+| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community               |
+| `obsidian`    | boolean | `false`        | Export an Obsidian vault                                    |
+| `svg`         | boolean | `false`        | Export `graph.svg`                                          |
+| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                          |
+| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                                       |
+| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j                     |
 | `provider`    | object  | —              | `{ backend, model }` — select an LLM backend for extraction |
 
 `provider.backend` is one of `azure`, `bedrock`, `claude`, `claude-cli`,

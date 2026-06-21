@@ -62,40 +62,20 @@ README.md / CONTRIBUTING.md / RELEASE.md / PULL_REQUEST_TEMPLATE.md (MODIFY)
 ### Task 1: Extract shared `InstallAgent` type
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/utils/agents.ts`
 - Modify: `packages/nx-graphify/src/generators/init/schema.d.ts`
 - Test: existing `packages/nx-graphify/src/generators/init/generator.spec.ts` (must still pass unchanged after this task — it doesn't import the type directly)
 
 **Interfaces:**
+
 - Produces: `InstallAgent` type, exported from `packages/nx-graphify/src/utils/agents.ts`, consumed by both `init` and the new `uninstall-agents` generator schemas (Task 3).
 
 - [ ] **Step 1: Create the shared type file**
 
 ```ts
 // packages/nx-graphify/src/utils/agents.ts
-export type InstallAgent =
-  | 'claude'
-  | 'codex'
-  | 'opencode'
-  | 'kilo'
-  | 'aider'
-  | 'copilot'
-  | 'claw'
-  | 'droid'
-  | 'trae'
-  | 'trae-cn'
-  | 'hermes'
-  | 'kiro'
-  | 'pi'
-  | 'codebuddy'
-  | 'antigravity'
-  | 'antigravity-windows'
-  | 'windows'
-  | 'kimi'
-  | 'amp'
-  | 'devin'
-  | 'gemini'
-  | 'cursor';
+export type InstallAgent = 'claude' | 'codex' | 'opencode' | 'kilo' | 'aider' | 'copilot' | 'claw' | 'droid' | 'trae' | 'trae-cn' | 'hermes' | 'kiro' | 'pi' | 'codebuddy' | 'antigravity' | 'antigravity-windows' | 'windows' | 'kimi' | 'amp' | 'devin' | 'gemini' | 'cursor';
 ```
 
 - [ ] **Step 2: Update `init/schema.d.ts` to import it instead of declaring its own copy**
@@ -126,10 +106,12 @@ git commit -m "refactor(nx-graphify): extract shared InstallAgent type"
 ### Task 2: `init` generator — add `--project`, fix wrong test expectations
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/generators/init/generator.ts`
 - Modify: `packages/nx-graphify/src/generators/init/generator.spec.ts`
 
 **Interfaces:**
+
 - Consumes: nothing new.
 - Produces: `init` now always runs `graphify install --project --platforms <agents>` (was `graphify install --platforms <agents>`).
 
@@ -165,9 +147,7 @@ describe('init generator', () => {
 
     await initGenerator(tree, {});
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`)."
-    );
+    expect(warnSpy).toHaveBeenCalledWith("You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).");
     expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms ', {
       stdio: 'inherit',
     });
@@ -188,9 +168,7 @@ describe('init generator', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -209,10 +187,7 @@ describe('init generator', () => {
 
     await initGenerator(tree, { installAgent: ['claude', 'cursor', 'codex'] });
 
-    expect(execSync).toHaveBeenCalledWith(
-      'graphify install --project --platforms claude|cursor|codex',
-      { stdio: 'inherit' }
-    );
+    expect(execSync).toHaveBeenCalledWith('graphify install --project --platforms claude|cursor|codex', { stdio: 'inherit' });
     expect(execSync).toHaveBeenCalledTimes(1);
   });
 
@@ -231,9 +206,7 @@ describe('init generator', () => {
       throw new Error('command not found');
     });
 
-    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow(
-      'command not found'
-    );
+    await expect(initGenerator(tree, { installAgent: ['claude'] })).rejects.toThrow('command not found');
   });
 });
 ```
@@ -252,21 +225,14 @@ import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { InitGeneratorSchema } from './schema';
 
-export default async function initGenerator(
-  tree: Tree,
-  options: InitGeneratorSchema,
-) {
+export default async function initGenerator(tree: Tree, options: InitGeneratorSchema) {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const installAgents = options.installAgent ?? [];
   if (options.installAgent && options.installAgent.length === 0) {
-    logger.warn(
-      "You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).",
-    );
+    logger.warn("You didn't specify an agent to install you can use --installAgent (e.g. --installAgent=claude --installAgent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor`).");
   }
 
   const command = `graphify install --project --platforms ${installAgents.join('|')}`;
@@ -292,6 +258,7 @@ git commit -m "fix(nx-graphify): pass --project on init install, fix wrong throw
 ### Task 3: `uninstall-agents` generator (new)
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/generators/uninstall-agents/schema.json`
 - Create: `packages/nx-graphify/src/generators/uninstall-agents/schema.d.ts`
 - Create: `packages/nx-graphify/src/generators/uninstall-agents/generator.ts`
@@ -299,6 +266,7 @@ git commit -m "fix(nx-graphify): pass --project on init install, fix wrong throw
 - Modify: `packages/nx-graphify/generators.json`
 
 **Interfaces:**
+
 - Consumes: `InstallAgent` from `../../utils/agents` (Task 1), `checkGraphifyInstalled` from `../../utils/check-graphify`.
 - Produces: `uninstallAgentsGenerator(tree, options)` default export, `UninstallAgentsGeneratorSchema { agent?: InstallAgent[] }`.
 
@@ -317,30 +285,7 @@ git commit -m "fix(nx-graphify): pass --project on init install, fix wrong throw
       "description": "Run `graphify uninstall --project --platform <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--agent=claude --agent=cursor).",
       "items": {
         "type": "string",
-        "enum": [
-          "claude",
-          "codex",
-          "opencode",
-          "kilo",
-          "aider",
-          "copilot",
-          "claw",
-          "droid",
-          "trae",
-          "trae-cn",
-          "hermes",
-          "kiro",
-          "pi",
-          "codebuddy",
-          "antigravity",
-          "antigravity-windows",
-          "windows",
-          "kimi",
-          "amp",
-          "devin",
-          "gemini",
-          "cursor"
-        ]
+        "enum": ["claude", "codex", "opencode", "kilo", "aider", "copilot", "claw", "droid", "trae", "trae-cn", "hermes", "kiro", "pi", "codebuddy", "antigravity", "antigravity-windows", "windows", "kimi", "amp", "devin", "gemini", "cursor"]
       },
       "default": []
     }
@@ -387,27 +332,21 @@ describe('uninstall-agents generator', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(uninstallAgentsGenerator(tree, { agent: ['claude'] })).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(uninstallAgentsGenerator(tree, { agent: ['claude'] })).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
   it('throws when agent is not set', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await expect(uninstallAgentsGenerator(tree, {})).rejects.toThrow(
-      'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).'
-    );
+    await expect(uninstallAgentsGenerator(tree, {})).rejects.toThrow('You must specify at least one --agent (e.g. --agent=claude --agent=cursor).');
     expect(execSync).not.toHaveBeenCalled();
   });
 
   it('throws when agent is an empty array', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
-    await expect(uninstallAgentsGenerator(tree, { agent: [] })).rejects.toThrow(
-      'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).'
-    );
+    await expect(uninstallAgentsGenerator(tree, { agent: [] })).rejects.toThrow('You must specify at least one --agent (e.g. --agent=claude --agent=cursor).');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -426,10 +365,7 @@ describe('uninstall-agents generator', () => {
 
     await uninstallAgentsGenerator(tree, { agent: ['claude', 'cursor', 'codex'] });
 
-    expect(execSync).toHaveBeenCalledWith(
-      'graphify uninstall --project --platform claude|cursor|codex',
-      { stdio: 'inherit' }
-    );
+    expect(execSync).toHaveBeenCalledWith('graphify uninstall --project --platform claude|cursor|codex', { stdio: 'inherit' });
     expect(execSync).toHaveBeenCalledTimes(1);
   });
 
@@ -439,9 +375,7 @@ describe('uninstall-agents generator', () => {
 
     await uninstallAgentsGenerator(tree, { agent: ['claude'] });
 
-    expect(infoSpy).toHaveBeenCalledWith(
-      'Running: graphify uninstall --project --platform claude'
-    );
+    expect(infoSpy).toHaveBeenCalledWith('Running: graphify uninstall --project --platform claude');
   });
 
   it('propagates the error when the uninstall command fails', async () => {
@@ -450,9 +384,7 @@ describe('uninstall-agents generator', () => {
       throw new Error('command not found');
     });
 
-    await expect(uninstallAgentsGenerator(tree, { agent: ['claude'] })).rejects.toThrow(
-      'command not found'
-    );
+    await expect(uninstallAgentsGenerator(tree, { agent: ['claude'] })).rejects.toThrow('command not found');
   });
 });
 ```
@@ -471,21 +403,14 @@ import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { UninstallAgentsGeneratorSchema } from './schema';
 
-export default async function uninstallAgentsGenerator(
-  tree: Tree,
-  options: UninstallAgentsGeneratorSchema,
-) {
+export default async function uninstallAgentsGenerator(tree: Tree, options: UninstallAgentsGeneratorSchema) {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const agents = options.agent ?? [];
   if (agents.length === 0) {
-    throw new Error(
-      'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).',
-    );
+    throw new Error('You must specify at least one --agent (e.g. --agent=claude --agent=cursor).');
   }
 
   const command = `graphify uninstall --project --platform ${agents.join('|')}`;
@@ -531,10 +456,12 @@ git commit -m "feat(nx-graphify): add uninstall-agents generator"
 ### Task 4: `provider.backend` / `provider.model` in `build-args.ts`
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/utils/build-args.ts`
 - Modify: `packages/nx-graphify/src/utils/build-args.spec.ts`
 
 **Interfaces:**
+
 - Produces: `ProviderBackend` type and `provider?: { backend?: ProviderBackend; model?: string }` field on `GraphifyArgsOptions`, both exported from `packages/nx-graphify/src/utils/build-args.ts`. `GraphifyExecutorSchema` (`executors/graphify/schema.d.ts`) already extends `GraphifyArgsOptions`, so both executor schemas pick this up automatically with no further `.d.ts` changes.
 
 - [ ] **Step 1: Write the failing tests**
@@ -542,49 +469,29 @@ git commit -m "feat(nx-graphify): add uninstall-agents generator"
 Append to `packages/nx-graphify/src/utils/build-args.spec.ts` (inside the existing `describe('buildGraphifyArgs', ...)` block, after the last existing `it`):
 
 ```ts
-  it('adds --backend when provider.backend is set', () => {
-    const options: GraphifyArgsOptions = { provider: { backend: 'openai' } };
+it('adds --backend when provider.backend is set', () => {
+  const options: GraphifyArgsOptions = { provider: { backend: 'openai' } };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--backend',
-      'openai',
-      '--project',
-      'foo',
-    ]);
-  });
+  expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--backend', 'openai', '--project', 'foo']);
+});
 
-  it('adds --backend and --model when both provider.backend and provider.model are set', () => {
-    const options: GraphifyArgsOptions = {
-      provider: { backend: 'openai', model: 'gpt-4' },
-    };
+it('adds --backend and --model when both provider.backend and provider.model are set', () => {
+  const options: GraphifyArgsOptions = {
+    provider: { backend: 'openai', model: 'gpt-4' },
+  };
 
-    expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--backend',
-      'openai',
-      '--model',
-      'gpt-4',
-      '--project',
-      'foo',
-    ]);
-  });
+  expect(buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--backend', 'openai', '--model', 'gpt-4', '--project', 'foo']);
+});
 
-  it('omits --backend/--model when provider is not set', () => {
-    expect(buildGraphifyArgs({}, '/repo/apps/foo', 'foo')).toEqual([
-      '/repo/apps/foo',
-      '--project',
-      'foo',
-    ]);
-  });
+it('omits --backend/--model when provider is not set', () => {
+  expect(buildGraphifyArgs({}, '/repo/apps/foo', 'foo')).toEqual(['/repo/apps/foo', '--project', 'foo']);
+});
 
-  it('throws when provider.model is set without provider.backend', () => {
-    const options: GraphifyArgsOptions = { provider: { model: 'gpt-4' } };
+it('throws when provider.model is set without provider.backend', () => {
+  const options: GraphifyArgsOptions = { provider: { model: 'gpt-4' } };
 
-    expect(() => buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toThrow(
-      'provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).'
-    );
-  });
+  expect(() => buildGraphifyArgs(options, '/repo/apps/foo', 'foo')).toThrow('provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).');
+});
 ```
 
 - [ ] **Step 2: Run it to verify it fails**
@@ -596,16 +503,7 @@ Expected: FAIL — `provider` isn't a recognized field yet / no `--backend` emit
 
 ```ts
 // packages/nx-graphify/src/utils/build-args.ts
-export type ProviderBackend =
-  | 'azure'
-  | 'bedrock'
-  | 'claude'
-  | 'claude-cli'
-  | 'deepseek'
-  | 'gemini'
-  | 'kimi'
-  | 'ollama'
-  | 'openai';
+export type ProviderBackend = 'azure' | 'bedrock' | 'claude' | 'claude-cli' | 'deepseek' | 'gemini' | 'kimi' | 'ollama' | 'openai';
 
 export interface GraphifyArgsOptions {
   mode?: 'normal' | 'deep';
@@ -624,11 +522,7 @@ export interface GraphifyArgsOptions {
   };
 }
 
-export function buildGraphifyArgs(
-  options: GraphifyArgsOptions,
-  targetPath: string,
-  projectName: string,
-): string[] {
+export function buildGraphifyArgs(options: GraphifyArgsOptions, targetPath: string, projectName: string): string[] {
   const args: string[] = [targetPath];
   if (options.mode === 'deep') args.push('--mode', 'deep');
   if (options.update) args.push('--update');
@@ -641,9 +535,7 @@ export function buildGraphifyArgs(
   if (options.neo4j) args.push('--neo4j');
   if (options.neo4jPush) args.push('--neo4j-push', options.neo4jPush);
   if (options.provider?.model && !options.provider?.backend) {
-    throw new Error(
-      'provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).',
-    );
+    throw new Error('provider.model requires provider.backend to be set (e.g. provider: { backend: "openai", model: "gpt-4" }).');
   }
   if (options.provider?.backend) {
     args.push('--backend', options.provider.backend);
@@ -673,10 +565,12 @@ git commit -m "feat(nx-graphify): add provider.backend/provider.model extraction
 ### Task 5: Expose `provider` in the executor JSON schemas
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/executors/graphify/schema.json`
 - Modify: `packages/nx-graphify/src/executors/graphify-workspace/schema.json`
 
 **Interfaces:**
+
 - Consumes: `ProviderBackend` enum values from Task 4 (duplicated literally in JSON, same convention as `InstallAgent` enums elsewhere in this codebase).
 - Produces: nothing new for later tasks — this is JSON-schema-only documentation/validation, the actual TS typing already flows through `GraphifyExecutorSchema extends GraphifyArgsOptions` (Task 4).
 
@@ -734,6 +628,7 @@ git commit -m "feat(nx-graphify): document provider.backend/model in executor sc
 ### Task 6: `purge` executor (new)
 
 **Files:**
+
 - Create: `packages/nx-graphify/src/executors/purge/schema.json`
 - Create: `packages/nx-graphify/src/executors/purge/schema.d.ts`
 - Create: `packages/nx-graphify/src/executors/purge/executor.ts`
@@ -741,6 +636,7 @@ git commit -m "feat(nx-graphify): document provider.backend/model in executor sc
 - Modify: `packages/nx-graphify/executors.json`
 
 **Interfaces:**
+
 - Consumes: `checkGraphifyInstalled` from `../../utils/check-graphify`.
 - Produces: default-exported `PromiseExecutor<PurgeExecutorSchema>`, `PurgeExecutorSchema { outputDir?: string }` — consumed by Task 7's `createNodes` wiring as `nx-graphify:purge`.
 
@@ -815,9 +711,7 @@ describe('purge executor', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(executor(baseOptions, makeContext('foo', 'apps/foo'))).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
-    );
+    await expect(executor(baseOptions, makeContext('foo', 'apps/foo'))).rejects.toThrow('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
     expect(execSync).not.toHaveBeenCalled();
   });
 
@@ -872,14 +766,9 @@ import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { PurgeExecutorSchema } from './schema';
 
-const runExecutor: PromiseExecutor<PurgeExecutorSchema> = async (
-  options,
-  context: ExecutorContext,
-) => {
+const runExecutor: PromiseExecutor<PurgeExecutorSchema> = async (options, context: ExecutorContext) => {
   if (!checkGraphifyInstalled()) {
-    throw new Error(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
-    );
+    throw new Error('graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install');
   }
 
   const projectName = context.projectName as string;
@@ -951,50 +840,42 @@ git commit -m "feat(nx-graphify): add purge executor"
 ### Task 7: Wire `purge` into `createNodes`, thread `provider` through plugin defaults
 
 **Files:**
+
 - Modify: `packages/nx-graphify/src/plugin/index.ts`
 - Modify: `packages/nx-graphify/src/plugin/index.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `nx-graphify:purge` executor string (Task 6, must match `executors.json` key exactly — `index.spec.ts` already has a test asserting every emitted executor string is registered in `executors.json`).
 - Produces: every matched project (including workspace root) gets a `purge` target; `resolveGraphifyOptions` forwards `provider` when set.
 
 - [ ] **Step 1: Write the failing tests** — append to `packages/nx-graphify/src/plugin/index.spec.ts`, inside `describe('createNodes', ...)`, after the existing tests:
 
 ```ts
-  it('attaches an uncached purge target to every matched project, including workspace root', async () => {
-    const result = await createNodesFunction(
-      ['package.json', 'apps/foo/project.json'],
-      {},
-      fakeContext()
-    );
+it('attaches an uncached purge target to every matched project, including workspace root', async () => {
+  const result = await createNodesFunction(['package.json', 'apps/foo/project.json'], {}, fakeContext());
 
-    const projectsByRoot = Object.fromEntries(
-      result.flatMap(([, { projects }]) => Object.entries(projects ?? {}))
-    );
+  const projectsByRoot = Object.fromEntries(result.flatMap(([, { projects }]) => Object.entries(projects ?? {})));
 
-    expect(projectsByRoot['.'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
-      options: { outputDir: 'graphify-out' },
-    });
-    expect(projectsByRoot['apps/foo'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
-      options: { outputDir: 'graphify-out' },
-    });
+  expect(projectsByRoot['.'].targets!.purge).toEqual({
+    executor: 'nx-graphify:purge',
+    options: { outputDir: 'graphify-out' },
   });
-
-  it('uses the resolved outputDir override for the purge target options', async () => {
-    const result = await createNodesFunction(
-      ['apps/foo/project.json'],
-      { outputDir: 'custom-out' },
-      fakeContext()
-    );
-
-    const [, { projects }] = result[0];
-    expect(projects!['apps/foo'].targets!.purge).toEqual({
-      executor: 'nx-graphify:purge',
-      options: { outputDir: 'custom-out' },
-    });
+  expect(projectsByRoot['apps/foo'].targets!.purge).toEqual({
+    executor: 'nx-graphify:purge',
+    options: { outputDir: 'graphify-out' },
   });
+});
+
+it('uses the resolved outputDir override for the purge target options', async () => {
+  const result = await createNodesFunction(['apps/foo/project.json'], { outputDir: 'custom-out' }, fakeContext());
+
+  const [, { projects }] = result[0];
+  expect(projects!['apps/foo'].targets!.purge).toEqual({
+    executor: 'nx-graphify:purge',
+    options: { outputDir: 'custom-out' },
+  });
+});
 ```
 
 - [ ] **Step 2: Run it to verify it fails**
@@ -1014,9 +895,7 @@ import type { GraphifyPluginOptions } from './schema';
 
 const GRAPHIFY_CONFIG_GLOB = '{**/project.json,**/package.json}';
 
-export function resolveGraphifyOptions(
-  pluginOptions: GraphifyPluginOptions = {}
-): GraphifyExecutorSchema {
+export function resolveGraphifyOptions(pluginOptions: GraphifyPluginOptions = {}): GraphifyExecutorSchema {
   return {
     outputDir: pluginOptions.outputDir ?? 'graphify-out',
     mode: pluginOptions.mode ?? 'normal',
@@ -1037,11 +916,7 @@ export function resolveGraphifyOptions(
 
 export const createNodes: CreateNodes<GraphifyPluginOptions> = [
   GRAPHIFY_CONFIG_GLOB,
-  (
-    configFiles: readonly string[],
-    options: GraphifyPluginOptions | undefined,
-    context: CreateNodesContext
-  ) => {
+  (configFiles: readonly string[], options: GraphifyPluginOptions | undefined, context: CreateNodesContext) => {
     return createNodesFromFiles(
       (configFile) => {
         const projectRoot = dirname(configFile);
@@ -1078,7 +953,7 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
       },
       configFiles,
       options ?? {},
-      context
+      context,
     );
   },
 ];
@@ -1108,6 +983,7 @@ git commit -m "feat(nx-graphify): infer purge target on every project, forward p
 ### Task 8: Scaffold the e2e project
 
 **Files:**
+
 - Generates: `e2e/src/nx-graphify.spec.ts`, `e2e/tsconfig.json`, `e2e/package.json`, `e2e/.spec.swcrc`, `e2e/tsconfig.spec.json`, `e2e/jest.config.cts`, `jest.preset.js`, `jest.config.ts`, `tools/scripts/start-local-registry.ts`, `tools/scripts/stop-local-registry.ts`, `tools/scripts/registry.d.ts`
 - Modifies: `nx.json`, `package.json`, `.vscode/extensions.json`, `.gitignore`, `pnpm-workspace.yaml`
 
@@ -1126,6 +1002,7 @@ npx nx g @nx/plugin:e2e-project --pluginName=@fennet82/nx-graphify --npmPackageN
 ```
 
 Expected output (confirmed via `--dry-run` during planning):
+
 ```
 CREATE e2e/src/nx-graphify.spec.ts
 CREATE e2e/tsconfig.json
@@ -1162,9 +1039,11 @@ git commit -m "chore(nx-graphify): scaffold e2e project via @nx/plugin:e2e-proje
 ### Task 9: Real e2e scenarios for init, uninstall-agents, and purge
 
 **Files:**
+
 - Modify: `e2e/src/nx-graphify.spec.ts` (replace generated boilerplate body, keep the `createTestProject` helper)
 
 **Interfaces:**
+
 - Consumes: the live, registry-installed `@fennet82/nx-graphify` package (built from current source by Task 8's `dependsOn: ['^build']` wiring) and the generators/executor registered in Tasks 2/3/6/7.
 
 - [ ] **Step 1: Replace the file with the full scenario suite**
@@ -1204,16 +1083,7 @@ describe('nx-graphify', () => {
     fakeGraphifyBinDir = mkdtempSync(join(tmpdir(), 'fake-graphify-'));
     graphifyLogFile = join(fakeGraphifyBinDir, 'graphify.log');
     writeFileSync(graphifyLogFile, '');
-    writeFileSync(
-      join(fakeGraphifyBinDir, 'graphify'),
-      [
-        '#!/usr/bin/env bash',
-        `echo "$@" >> "${graphifyLogFile}"`,
-        'if [ "$1" = "--version" ]; then echo "graphify-fake 0.0.0"; fi',
-        'exit 0',
-        '',
-      ].join('\n')
-    );
+    writeFileSync(join(fakeGraphifyBinDir, 'graphify'), ['#!/usr/bin/env bash', `echo "$@" >> "${graphifyLogFile}"`, 'if [ "$1" = "--version" ]; then echo "graphify-fake 0.0.0"; fi', 'exit 0', ''].join('\n'));
     chmodSync(join(fakeGraphifyBinDir, 'graphify'), 0o755);
 
     execOptions = {
@@ -1247,20 +1117,14 @@ describe('nx-graphify', () => {
   });
 
   it('runs `graphify uninstall --project --platform <agent>` via the uninstall-agents generator', () => {
-    execSync(
-      'npx nx g @fennet82/nx-graphify:uninstall-agents --agent=claude',
-      execOptions
-    );
+    execSync('npx nx g @fennet82/nx-graphify:uninstall-agents --agent=claude', execOptions);
 
     const log = readFileSync(graphifyLogFile, 'utf-8');
     expect(log).toContain('uninstall --project --platform claude');
   });
 
   it('runs `graphify uninstall --project --purge` via the inferred purge target', () => {
-    const projects = JSON.parse(
-      execSync('npx nx show projects', execOptions as { cwd: string; env: NodeJS.ProcessEnv })
-        .toString()
-    ) as string[];
+    const projects = JSON.parse(execSync('npx nx show projects', execOptions as { cwd: string; env: NodeJS.ProcessEnv }).toString()) as string[];
     expect(projects.length).toBeGreaterThan(0);
 
     execSync(`npx nx run ${projects[0]}:purge`, execOptions);
@@ -1281,14 +1145,11 @@ function createTestProject() {
   rmSync(projectDirectory, { recursive: true, force: true });
   mkdirSync(dirname(projectDirectory), { recursive: true });
 
-  execSync(
-    `pnpm dlx create-nx-workspace@latest ${projectName} --preset apps --nxCloud=skip --no-interactive`,
-    {
-      cwd: dirname(projectDirectory),
-      stdio: 'inherit',
-      env: process.env,
-    }
-  );
+  execSync(`pnpm dlx create-nx-workspace@latest ${projectName} --preset apps --nxCloud=skip --no-interactive`, {
+    cwd: dirname(projectDirectory),
+    stdio: 'inherit',
+    env: process.env,
+  });
   console.log(`Created test project in "${projectDirectory}"`);
 
   return projectDirectory;
@@ -1314,6 +1175,7 @@ git commit -m "test(nx-graphify): add e2e coverage for init, uninstall-agents, p
 ### Task 10: Docs — README, CONTRIBUTING, RELEASE, PR template
 
 **Files:**
+
 - Modify: `README.md`
 - Modify: `CONTRIBUTING.md`
 - Modify: `RELEASE.md`
@@ -1331,17 +1193,18 @@ Nx workspace containing the `nx-graphify` plugin — wraps the
 Nx plugin.
 
 ## Structure
+```
 
-```
-packages/nx-graphify/   the published plugin (@fennet82/nx-graphify)
-  src/
-    executors/          graphify, graphify-workspace, purge
-    generators/         init, uninstall-agents
-    plugin/             createNodes target inference
-    utils/              shared CLI-arg building, agent/backend enums
-e2e/                    end-to-end tests against a local npm registry
-docs/superpowers/       design specs and implementation plans
-```
+packages/nx-graphify/ the published plugin (@fennet82/nx-graphify)
+src/
+executors/ graphify, graphify-workspace, purge
+generators/ init, uninstall-agents
+plugin/ createNodes target inference
+utils/ shared CLI-arg building, agent/backend enums
+e2e/ end-to-end tests against a local npm registry
+docs/superpowers/ design specs and implementation plans
+
+````
 
 See [docs/superpowers/specs](./docs/superpowers/specs) for design specs and
 [docs/superpowers/plans](./docs/superpowers/plans) for implementation plans.
@@ -1354,7 +1217,7 @@ Register the plugin in your `nx.json`:
 {
   "plugins": ["@fennet82/nx-graphify/plugin"]
 }
-```
+````
 
 This infers a `graphify` target on every project, a `graphify-workspace`
 target and a `purge` target on the workspace root, and a `purge` target on
@@ -1362,13 +1225,13 @@ every other project too.
 
 ## Commands
 
-| Command | What it runs |
-| --- | --- |
-| `nx run <project>:graphify` | `graphify <projectRoot> [flags] --project <project>` |
-| `nx run <root>:graphify-workspace` | `graphify <workspaceRoot> [flags] --project <root>` |
-| `nx run <project>:purge` | `graphify uninstall --project --purge` (cwd = that project's root) |
-| `nx g @fennet82/nx-graphify:init --installAgent=claude` | `graphify install --project --platforms claude` |
-| `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude` |
+| Command                                                      | What it runs                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags] --project <project>`               |
+| `nx run <root>:graphify-workspace`                           | `graphify <workspaceRoot> [flags] --project <root>`                |
+| `nx run <project>:purge`                                     | `graphify uninstall --project --purge` (cwd = that project's root) |
+| `nx g @fennet82/nx-graphify:init --installAgent=claude`      | `graphify install --project --platforms claude`                    |
+| `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude`                   |
 
 `init` and `uninstall-agents` always run from the workspace root. `purge` can
 run on any project, or the workspace root, since each cleans only that
@@ -1400,7 +1263,8 @@ npx nx e2e e2e
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full contributor workflow
 and [RELEASE.md](./RELEASE.md) for the release process.
-```
+
+````
 
 - [ ] **Step 2: Read the current `CONTRIBUTING.md`** (already edited by the repo owner) and align its commands with this repo's actual tooling — replace any `npm`/Yarn-specific instructions with the `pnpm` equivalents actually used here, and add the e2e command:
 
@@ -1438,7 +1302,7 @@ Add an explicit e2e checklist item distinguishing it from the existing generic "
 # Issue
 
 Resolves #
-```
+````
 
 - [ ] **Step 5: Commit**
 

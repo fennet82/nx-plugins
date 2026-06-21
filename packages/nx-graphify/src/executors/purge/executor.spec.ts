@@ -14,7 +14,10 @@ vi.mock('../../utils/check-graphify', () => ({
 
 const baseOptions: PurgeExecutorSchema = { outputDir: 'graphify-out' };
 
-function makeContext(projectName: string, projectRoot: string): ExecutorContext {
+function makeContext(
+  projectName: string,
+  projectRoot: string,
+): ExecutorContext {
   return {
     root: '/repo',
     cwd: '/repo',
@@ -37,8 +40,10 @@ describe('purge executor', () => {
   it('throws when graphify is not installed', async () => {
     (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    await expect(executor(baseOptions, makeContext('foo', 'apps/foo'))).rejects.toThrow(
-      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
+    await expect(
+      executor(baseOptions, makeContext('foo', 'apps/foo')),
+    ).rejects.toThrow(
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
     );
     expect(execSync).not.toHaveBeenCalled();
   });
@@ -48,10 +53,13 @@ describe('purge executor', () => {
 
     const result = await executor(baseOptions, makeContext('foo', 'apps/foo'));
 
-    expect(execSync).toHaveBeenCalledWith('graphify uninstall --project --purge', {
-      stdio: 'inherit',
-      cwd: '/repo/apps/foo',
-    });
+    expect(execSync).toHaveBeenCalledWith(
+      'graphify uninstall --project --purge',
+      {
+        stdio: 'inherit',
+        cwd: '/repo/apps/foo',
+      },
+    );
     expect(result).toEqual({ success: true });
   });
 
@@ -60,10 +68,13 @@ describe('purge executor', () => {
 
     await executor(baseOptions, makeContext('workspace', '.'));
 
-    expect(execSync).toHaveBeenCalledWith('graphify uninstall --project --purge', {
-      stdio: 'inherit',
-      cwd: '/repo',
-    });
+    expect(execSync).toHaveBeenCalledWith(
+      'graphify uninstall --project --purge',
+      {
+        stdio: 'inherit',
+        cwd: '/repo',
+      },
+    );
   });
 
   it('returns success: false when execSync throws', async () => {

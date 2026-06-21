@@ -5,7 +5,7 @@
     "name": "elad cohen"
   },
   "homepage": "https://github.com/fennet82/nx-plugins",
-  "version": "0.0.0-e2e",
+  "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "prepare": "husky"
