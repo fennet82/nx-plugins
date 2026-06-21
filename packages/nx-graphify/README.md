@@ -143,6 +143,16 @@ in `nx.json` (see [Setup](#setup)) — same options, same caching behavior as
 `graphify`, just run once across the entire workspace from the repo root
 instead of once per project.
 
+If your workspace root itself has a `package.json` (true for most
+workspaces, including this one), it's also a project in Nx's graph and gets
+its own `graphify` target alongside `graphify-workspace`. Running `graphify`
+on that root project is functionally identical to `graphify-workspace` —
+both end up invoking Graphify against the workspace root with the same cwd,
+verified by diffing their actual CLI invocations. `graphify-workspace`
+exists as the explicit, always-present entry point for "run across the
+whole repo," independent of whether the root happens to be a recognized
+project.
+
 ### `purge` (per project, including workspace root)
 
 Runs `graphify uninstall --project --purge`, scoped to that project's own
