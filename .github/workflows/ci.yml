@@ -37,7 +37,7 @@ jobs:
         run: pnpm install
 
       - name: Derive appropriate SHAs for base/head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
 
       # nx-graphify-e2e declares an implicitDependency on @fennet82/nx-graphify,
       # so `nx affected` always marks it affected when the plugin changes (in
