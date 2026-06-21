@@ -1,6 +1,6 @@
 {
   "name": "@fennet82/nx-graphify",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Nx self-inferring plugin for Graphify — build knowledge graphs from your monorepo projects",
   "publishConfig": {
     "access": "public"
