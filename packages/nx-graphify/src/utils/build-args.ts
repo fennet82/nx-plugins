@@ -22,7 +22,6 @@ export interface GraphifyArgsOptions {
 export function buildGraphifyArgs(
   options: GraphifyArgsOptions,
   targetPath: string,
-  projectName: string,
 ): string[] {
   const args: string[] = [targetPath];
   if (options.mode === 'deep') args.push('--mode', 'deep');
@@ -46,6 +45,5 @@ export function buildGraphifyArgs(
       args.push('--model', options.provider.model);
     }
   }
-  args.push('--project', projectName);
   return args;
 }

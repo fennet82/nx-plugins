@@ -43,18 +43,16 @@ This infers:
 
 | Command                                                      | What it runs                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags] --project <project>`               |
-| `nx run <root>:graphify-workspace`                           | `graphify <workspaceRoot> [flags] --project <root>`                |
+| `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags]`                                   |
+| `nx run <root>:graphify-workspace`                           | `graphify <workspaceRoot> [flags]`                                 |
 | `nx run <project>:purge`                                     | `graphify uninstall --project --purge` (cwd = that project's root) |
 | `nx g @fennet82/nx-graphify:init --installAgent=claude`      | `graphify install --project --platform claude`                     |
 | `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude`                   |
 
 `init` and `uninstall-agents` always run from the workspace root and always
 pass graphify's `--project` flag (graphify's own project-vs-global install
-distinction — unrelated to the value-taking `--project <name>` flag used by
-the extraction targets above). `purge` can run on any project or the
-workspace root, since each cleans only that project's own `graphify-out`
-directory.
+distinction). `purge` can run on any project or the workspace root, since
+each cleans only that project's own `graphify-out` directory.
 
 Extraction targets (`graphify`/`graphify-workspace`) also accept a nested
 `provider` option to select an LLM backend:

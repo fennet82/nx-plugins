@@ -15,7 +15,7 @@ const runExecutor: PromiseExecutor<GraphifyWorkspaceExecutorSchema> = async (
     );
   }
 
-  const args = buildGraphifyArgs(options, context.root, 'workspace');
+  const args = buildGraphifyArgs(options, context.root);
   const command = `graphify ${args.join(' ')}`;
 
   logger.info(`Running: ${command}`);

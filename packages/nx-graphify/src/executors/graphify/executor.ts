@@ -17,7 +17,7 @@ const runExecutor: PromiseExecutor<GraphifyExecutorSchema> = async (
 
   const projectName = context.projectName as string;
   const projectRoot = context.projectsConfigurations.projects[projectName].root;
-  const args = buildGraphifyArgs(options, projectRoot, projectName);
+  const args = buildGraphifyArgs(options, projectRoot);
   const command = `graphify ${args.join(' ')}`;
 
   logger.info(`Running: ${command}`);

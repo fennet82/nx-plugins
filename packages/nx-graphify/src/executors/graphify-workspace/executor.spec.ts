@@ -48,13 +48,10 @@ describe('graphify-workspace executor', () => {
     const result = await executor(baseOptions, makeContext());
 
     expect(result).toEqual({ success: true });
-    expect(execSync).toHaveBeenCalledWith(
-      'graphify /repo --project workspace',
-      {
-        stdio: 'inherit',
-        cwd: '/repo',
-      },
-    );
+    expect(execSync).toHaveBeenCalledWith('graphify /repo', {
+      stdio: 'inherit',
+      cwd: '/repo',
+    });
   });
 
   it('returns success: false when execSync throws', async () => {

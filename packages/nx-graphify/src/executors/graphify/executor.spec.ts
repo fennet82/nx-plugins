@@ -52,7 +52,7 @@ describe('graphify executor', () => {
     const result = await executor(baseOptions, makeContext());
 
     expect(result).toEqual({ success: true });
-    expect(execSync).toHaveBeenCalledWith('graphify apps/foo --project foo', {
+    expect(execSync).toHaveBeenCalledWith('graphify apps/foo', {
       stdio: 'inherit',
       cwd: '/repo',
     });
