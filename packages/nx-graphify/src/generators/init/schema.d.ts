@@ -1,26 +1,4 @@
-export type InstallAgent =
-  | 'claude'
-  | 'codex'
-  | 'opencode'
-  | 'kilo'
-  | 'aider'
-  | 'copilot'
-  | 'claw'
-  | 'droid'
-  | 'trae'
-  | 'trae-cn'
-  | 'hermes'
-  | 'kiro'
-  | 'pi'
-  | 'codebuddy'
-  | 'antigravity'
-  | 'antigravity-windows'
-  | 'windows'
-  | 'kimi'
-  | 'amp'
-  | 'devin'
-  | 'gemini'
-  | 'cursor';
+import type { InstallAgent } from '../../utils/agents';
 
 export interface InitGeneratorSchema {
   installAgent?: InstallAgent[];
