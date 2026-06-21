@@ -59,6 +59,31 @@
     "neo4jPush": {
       "type": "string",
       "description": "bolt:// URL to push directly to Neo4j"
+    },
+    "provider": {
+      "type": "object",
+      "description": "Select an LLM backend for extraction. provider.model requires provider.backend to also be set.",
+      "properties": {
+        "backend": {
+          "type": "string",
+          "enum": [
+            "azure",
+            "bedrock",
+            "claude",
+            "claude-cli",
+            "deepseek",
+            "gemini",
+            "kimi",
+            "ollama",
+            "openai"
+          ],
+          "description": "LLM backend to use for extraction"
+        },
+        "model": {
+          "type": "string",
+          "description": "Free-text model identifier, only valid alongside provider.backend"
+        }
+      }
     }
   },
   "required": []
