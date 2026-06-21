@@ -14,7 +14,13 @@ export function resolveGraphifyOptions(
   pluginOptions: GraphifyPluginOptions = {},
 ): GraphifyExecutorSchema {
   return {
-    outputDir: pluginOptions.outputDir ?? 'graphify-out',
+    // graphify always writes to its own hard-coded "graphify-out" directory —
+    // there's no CLI flag yet to customize it. Letting pluginOptions.outputDir
+    // override this would desync Nx's `outputs` cache declaration (below) from
+    // where graphify actually writes, silently breaking caching. Once graphify
+    // supports a real --output-dir flag, restore:
+    // outputDir: pluginOptions.outputDir ?? 'graphify-out',
+    outputDir: 'graphify-out',
     mode: pluginOptions.mode ?? 'normal',
     ...(pluginOptions.update !== undefined && { update: pluginOptions.update }),
     ...(pluginOptions.clusterOnly !== undefined && {

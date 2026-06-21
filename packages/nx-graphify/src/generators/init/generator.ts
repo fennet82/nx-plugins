@@ -47,6 +47,6 @@ function registerPlugin(tree: Tree) {
     return;
   }
 
-  nxJson.plugins = [...plugins, PLUGIN_PATH];
+  nxJson.plugins = [...plugins, { plugin: PLUGIN_PATH, options: {} }];
   updateNxJson(tree, nxJson);
 }

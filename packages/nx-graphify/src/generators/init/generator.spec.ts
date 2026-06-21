@@ -104,7 +104,9 @@ describe('init generator', () => {
 
     await initGenerator(tree, {});
 
-    expect(readNxJson(tree)?.plugins).toContain('@fennet82/nx-graphify/plugin');
+    expect(readNxJson(tree)?.plugins).toEqual([
+      { plugin: '@fennet82/nx-graphify/plugin', options: {} },
+    ]);
   });
 
   it('does not duplicate the plugin in nx.json if already registered as a string', async () => {

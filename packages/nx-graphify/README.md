@@ -29,7 +29,6 @@ Register the plugin in your workspace's `nx.json`:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "outputDir": "graphify-out",
         "mode": "normal"
       }
     }
@@ -133,9 +132,11 @@ say which agents you want removed.
 ### `graphify` (per project)
 
 Runs Graphify against a single project's root. Outputs (`graph.html`,
-`graph.json`, `GRAPH_REPORT.md`, and any optional exports) are written to
-`options.outputDir` (default `graphify-out`) and are cached by Nx like any
-other target.
+`graph.json`, `GRAPH_REPORT.md`, and any optional exports) are always
+written to `graphify-out` and are cached by Nx like any other target.
+`options.outputDir` exists in the schema for forward compatibility, but
+graphify doesn't yet support a custom output directory, so it's currently
+fixed to `graphify-out` regardless of what you set.
 
 ```bash
 # extract using whatever options are configured (workspace defaults +
@@ -182,20 +183,20 @@ nx affected -t purge
 
 ## Options
 
-| Option        | Type    | Default        | Description                                                 |
-| ------------- | ------- | -------------- | ----------------------------------------------------------- |
-| `outputDir`   | string  | `graphify-out` | Where outputs are written                                   |
-| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)              |
-| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph             |
-| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction                      |
-| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only               |
-| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community               |
-| `obsidian`    | boolean | `false`        | Export an Obsidian vault                                    |
-| `svg`         | boolean | `false`        | Export `graph.svg`                                          |
-| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                          |
-| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                                       |
-| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j                     |
-| `provider`    | object  | —              | `{ backend, model }` — select an LLM backend for extraction |
+| Option        | Type    | Default        | Description                                                                                                                                                          |
+| ------------- | ------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `outputDir`   | string  | `graphify-out` | **Not yet configurable** — graphify has no `--output-dir` flag, so this is always `graphify-out` regardless of what you set; reserved for when graphify adds support |
+| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)                                                                                                                       |
+| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph                                                                                                                      |
+| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction                                                                                                                               |
+| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only                                                                                                                        |
+| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community                                                                                                                        |
+| `obsidian`    | boolean | `false`        | Export an Obsidian vault                                                                                                                                             |
+| `svg`         | boolean | `false`        | Export `graph.svg`                                                                                                                                                   |
+| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                                                                                                                                   |
+| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                                                                                                                                                |
+| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j                                                                                                                              |
+| `provider`    | object  | —              | `{ backend, model }` — select an LLM backend for extraction                                                                                                          |
 
 ### `provider.backend` / `provider.model`
 

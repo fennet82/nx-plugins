@@ -7,7 +7,7 @@
   "properties": {
     "outputDir": {
       "type": "string",
-      "description": "Where Graphify outputs are written",
+      "description": "Where Graphify outputs are written. graphify does not yet support a custom output directory (always graphify-out) — this is fixed to that value and not actually configurable yet.",
       "default": "graphify-out"
     },
     "mode": {

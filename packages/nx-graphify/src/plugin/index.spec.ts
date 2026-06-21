@@ -35,17 +35,30 @@ describe('createNodes', () => {
   it('applies plugin-level option overrides from nx.json', async () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
-      { outputDir: 'custom-out', mode: 'deep' },
+      { mode: 'deep' },
       fakeContext(),
     );
 
     const [, { projects }] = result[0];
     expect(projects!['apps/foo'].targets!.graphify!.options).toEqual({
-      outputDir: 'custom-out',
+      outputDir: 'graphify-out',
       mode: 'deep',
     });
+  });
+
+  it('ignores an attempted outputDir override, since graphify does not support a custom output directory', async () => {
+    const result = await createNodesFunction(
+      ['apps/foo/project.json'],
+      { outputDir: 'custom-out' },
+      fakeContext(),
+    );
+
+    const [, { projects }] = result[0];
+    expect(projects!['apps/foo'].targets!.graphify!.options.outputDir).toBe(
+      'graphify-out',
+    );
     expect(projects!['apps/foo'].targets!.graphify!.outputs).toEqual([
-      '{projectRoot}/custom-out',
+      '{projectRoot}/graphify-out',
     ]);
   });
 
@@ -137,7 +150,7 @@ describe('createNodes', () => {
     });
   });
 
-  it('uses the resolved outputDir override for the purge target options', async () => {
+  it('ignores an attempted outputDir override for the purge target options too', async () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       { outputDir: 'custom-out' },
@@ -147,7 +160,7 @@ describe('createNodes', () => {
     const [, { projects }] = result[0];
     expect(projects!['apps/foo'].targets!.purge).toEqual({
       executor: '@fennet82/nx-graphify:purge',
-      options: { outputDir: 'custom-out' },
+      options: { outputDir: 'graphify-out' },
     });
   });
 });
