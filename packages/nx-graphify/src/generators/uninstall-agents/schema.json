@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "NxGraphifyUninstallAgents",
+  "title": "Uninstall AI assistant skills for Graphify",
+  "type": "object",
+  "properties": {
+    "agent": {
+      "type": "array",
+      "description": "Run `graphify uninstall --project --platform <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--agent=claude --agent=cursor).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "claude",
+          "codex",
+          "opencode",
+          "kilo",
+          "aider",
+          "copilot",
+          "claw",
+          "droid",
+          "trae",
+          "trae-cn",
+          "hermes",
+          "kiro",
+          "pi",
+          "codebuddy",
+          "antigravity",
+          "antigravity-windows",
+          "windows",
+          "kimi",
+          "amp",
+          "devin",
+          "gemini",
+          "cursor"
+        ]
+      },
+      "default": []
+    }
+  },
+  "required": []
+}

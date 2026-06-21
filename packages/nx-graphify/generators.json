@@ -4,6 +4,11 @@
       "factory": "./dist/generators/init/generator",
       "schema": "./dist/generators/init/schema.json",
       "description": "Install Graphify skills for one or more AI coding assistants"
+    },
+    "uninstall-agents": {
+      "factory": "./dist/generators/uninstall-agents/generator",
+      "schema": "./dist/generators/uninstall-agents/schema.json",
+      "description": "Uninstall Graphify skills for one or more AI coding assistants"
     }
   }
 }
