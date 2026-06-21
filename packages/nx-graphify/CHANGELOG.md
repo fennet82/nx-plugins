@@ -1,3 +1,13 @@
+## 0.3.0 (2026-06-21)
+
+### 🩹 Fixes
+
+- **nx-graphify:** set publishConfig.access public to fix provenance error ([0ce3567](https://github.com/fennet82/nx-plugins/commit/0ce3567))
+
+### ❤️ Thank You
+
+- elad cohen @fennet82
+
 ## 0.2.0 (2026-06-21)
 
 ### 🚀 Features
