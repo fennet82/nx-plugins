@@ -13,6 +13,11 @@ on:
           - minor
           - major
           - prerelease
+      first_release:
+        description: Is this the very first release? (no prior git tag exists yet)
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -44,21 +49,31 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Configure git identity for the release commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Lint, test, and build all projects
-        run: npx nx run-many -t lint test build
-
-      - name: Version, commit, tag, and push
-        run: npx nx release version ${{ inputs.version }} --git-commit --git-tag --git-push
-
-      - name: Publish to npm
-        run: npx nx release publish --access public
+      # CI (ci.yml) already lints/tests/builds every affected project on every
+      # push/PR to master, and the "preVersionCommand" in nx.json's release
+      # config builds everything again right before versioning — so there's
+      # no separate lint/test/build step here.
+      # Git commit/tag/push behavior comes from nx.json's release.git config,
+      # not flags here — the top-level `nx release` command doesn't accept
+      # --git-commit/--git-tag/--git-push (those are version/changelog
+      # subcommand-only flags).
+      - name: Version, changelog, GitHub release, and publish to npm
+        run: >
+          pnpm nx release ${{ inputs.version }}
+          --yes
+          ${{ inputs.first_release && '--first-release' || '' }}
         env:
+          # GitHub release creation (release.changelog.projectChangelogs.createRelease
+          # in nx.json) — the default Actions token, scoped by the contents:write
+          # permission above, no extra secret needed.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # npm publish auth + provenance
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

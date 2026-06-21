@@ -64,6 +64,17 @@
     "projects": ["*", "!@fennet82/nx-plugins", "!nx-graphify-e2e"],
     "version": {
       "preVersionCommand": "npx nx run-many -t build"
+    },
+    "changelog": {
+      "workspaceChangelog": false,
+      "projectChangelogs": {
+        "createRelease": "github"
+      }
+    },
+    "git": {
+      "commit": true,
+      "tag": true,
+      "push": true
     }
   },
   "targetDefaults": {
