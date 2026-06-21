@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Derive appropriate SHAs for base/head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      # nx-graphify-e2e declares an implicitDependency on @fennet82/nx-graphify,
+      # so `nx affected` always marks it affected when the plugin changes (in
+      # addition to when the e2e project's own files change) — no special-casing
+      # needed beyond that dependency already being declared in its package.json.
+      - name: Lint, test, build, and e2e affected projects
+        run: npx nx affected -t lint test build e2e

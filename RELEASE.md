@@ -1,32 +1,30 @@
 # Release Process
 
-This document outlines the intended process for releasing packages from this
-repository using GitHub Actions with NPM OIDC Trusted Publishing.
+This document outlines the process for releasing packages from this
+repository using GitHub Actions (`.github/workflows/publish.yml`).
 
 ## Prerequisites
 
-### NPM Trusted Publishing Setup
+### NPM Access Token
 
-For each package, you must configure NPM Trusted Publishing on npmjs.com:
+Publishing uses a classic npm access token, not OIDC trusted publishing.
 
-1. Go to [npmjs.com](https://npmjs.com) and log in
-2. Navigate to the package:
-   - `@fennet82/nx-graphify`
-3. Go to **Settings** → **Publishing Access**
-4. Click **Add Trusted Publisher**
-5. Select **GitHub Actions**
-6. Configure with these values:
-   - **Organization/User**: `fennet82`
-   - **Repository**: `nx-plugins`
-   - **Workflow file**: `publish.yml`
-   - **Environment name**: Leave empty (optional)
+1. Go to [npmjs.com](https://npmjs.com), log in, and open your profile
+2. **Access Tokens** → **Generate New Token** → **Granular Access Token**
+3. Grant it **Read and write** permission, scoped to the `@fennet82/nx-graphify`
+   package (or the `fennet82` org/scope, if you want it to cover future
+   packages too)
+4. In the GitHub repository, go to **Settings** → **Secrets and variables** →
+   **Actions** → **New repository secret**
+5. Name it `NPM_ACCESS_TOKEN` and paste the token value
 
 ### Required Permissions
 
-The GitHub Actions workflow requires these permissions:
+The publish workflow requires these permissions (already set in
+`publish.yml`):
 
-- `contents: write` - To push version tags and commits
-- `id-token: write` - To generate OIDC tokens for NPM publishing
+- `contents: write` - to commit the version bump, create the git tag, and push both back to the repo
+- `id-token: write` - to generate npm provenance attestations during publish
 
 ## Release Process
 
@@ -42,72 +40,59 @@ The GitHub Actions workflow requires these permissions:
    - **prerelease**: Alpha/beta versions (0.0.x-alpha.0)
 5. Click **Run workflow**
 
-The workflow should:
+The workflow:
 
-- Install dependencies
-- Run tests and linting for affected packages
-- Version affected packages using conventional commits
-- Build packages for publishing
-- Publish to NPM using OIDC (no tokens required)
-- Push version tags to Git
-- Create GitHub releases
+- Installs dependencies
+- Lints, tests, and builds every project (`nx run-many -t lint test build`)
+- Versions, commits, tags, and pushes (`nx release version <bump> --git-commit --git-tag --git-push`)
+- Publishes to npm with provenance (`nx release publish --access public`)
 
 ### What Gets Published
 
-Only **affected packages** are published. The workflow uses:
-
-```bash
-nx affected --target=version --releaseAs=<version-type>
-```
-
-This means:
-
-- Only packages that have changes since the last release are versioned and published
-- Unchanged packages are skipped automatically
-- Each package maintains independent versioning
+`nx.json`'s `release.projects` is `["*", "!@fennet82/nx-plugins", "!nx-graphify-e2e"]`
+— every project except the workspace root pseudo-project and the e2e test
+project. In practice this is just `@fennet82/nx-graphify` today; any new
+plugin added under `packages/` is automatically included.
 
 ### Security Features
 
-- **No NPM tokens required**: Uses OIDC for secure authentication
-- **Automatic provenance**: NPM automatically generates provenance attestations
-- **Workflow-specific credentials**: Each publish uses ephemeral, workflow-specific tokens
-- **Optional Nx Cloud integration**: Can enable distributed task execution (paid feature)
+- **Provenance**: `NPM_CONFIG_PROVENANCE: true` plus `id-token: write` makes npm generate provenance attestations for the published package
+- **Scoped token**: the npm access token should be scoped to only the packages this repo publishes, not your whole npm account
 
 ### Manual Release (Fallback)
 
-If needed, you can release manually:
+If needed, you can release manually from your own machine (requires being
+logged in to npm locally, e.g. via `npm login`):
 
 1. Install dependencies: `pnpm install`
-2. Version packages: `npx nx affected --target=version --releaseAs=patch`
-3. Build packages: `npx nx affected --target=build`
-4. Manually publish from `dist/packages/<package-name>`: `npm publish --access public --provenance`
+2. Lint, test, build: `npx nx run-many -t lint test build`
+3. Version, commit, tag: `npx nx release version patch --git-commit --git-tag`
+4. Push: `git push --follow-tags`
+5. Publish: `npx nx release publish --access public`
 
 ## Troubleshooting
 
-### OIDC Authentication Errors
+### Authentication Errors
 
-If you see authentication errors:
+If you see `401`/`403` errors from npm during publish:
 
-1. Verify NPM Trusted Publishing is configured correctly
-2. Ensure the workflow filename matches exactly (`publish.yml`)
-3. Check that the repository name is correct (`fennet82/nx-plugins`)
-4. Verify the package exists on npmjs.com
+1. Verify the `NPM_ACCESS_TOKEN` secret is set and hasn't expired
+2. Confirm the token has write access to `@fennet82/nx-graphify`
+3. Verify the package exists on npmjs.com (first publish must be done manually if the package name has never been published before)
 
-### No Packages Published
+### Push Errors During Versioning
 
-If no packages are published:
+If the `--git-push` step fails:
 
-- Check if there are actual changes since the last release
-- Review the "affected" detection by running: `npx nx show projects --affected --base=HEAD~1`
-- Ensure packages have been built successfully
+- Check branch protection rules on `master` allow the `github-actions[bot]` actor (or the token used) to push directly
+- Ensure no other release run is in progress (the workflow uses a `publish` concurrency group to serialize runs)
 
 ### Version Conflicts
 
 If versioning fails:
 
 - Check for uncommitted changes in the repository
-- Verify Git configuration is correct
-- Ensure the base branch (master) is up to date
+- Verify the base branch (`master`) is up to date
 
 ## Package Information
 
@@ -116,6 +101,18 @@ If versioning fails:
 - **Current version**: 0.1.0
 - **Description**: Nx self-inferring plugin for Graphify — build knowledge graphs from your monorepo projects
 - **NPM**: https://www.npmjs.com/package/@fennet82/nx-graphify
+
+## Continuous Integration
+
+`.github/workflows/ci.yml` runs on every push to `master` and on pull
+requests: it lints, tests, builds, and runs e2e for every *affected*
+project, using `nx-set-shas` to compute the diff base. `nx-graphify-e2e`
+declares `@fennet82/nx-graphify` as an implicit dependency, so it's always
+included whenever the plugin changes, not just when the e2e project's own
+files change.
+
+`.github/dependabot.yml` checks for npm and GitHub Actions dependency
+updates weekly.
 
 ## Conventional Commits
 

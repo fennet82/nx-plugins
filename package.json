@@ -10,7 +10,8 @@
   "scripts": {},
   "private": true,
   "devDependencies": {
-    "@eslint/js": "^9.8.0",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
     "@nx/eslint": "23.0.0",
     "@nx/eslint-plugin": "23.0.0",
     "@nx/jest": "23.0.0",
@@ -19,6 +20,7 @@
     "@nx/vite": "23.0.0",
     "@nx/vitest": "23.0.0",
     "@nx/web": "23.0.0",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@swc-node/register": "1.11.1",
     "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
@@ -29,7 +31,9 @@
     "@vitest/coverage-v8": "~4.1.0",
     "@vitest/ui": "~4.1.0",
     "commitlint": "^21.0.2",
-    "eslint": "~8.57.0",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
     "husky": "^9.1.7",
     "jest": "~30.3.0",
     "jest-environment-jsdom": "~30.3.0",
@@ -62,6 +66,5 @@
   },
   "workspaces": [
     "packages/*"
-  ],
-  "dependencies": {}
+  ]
 }

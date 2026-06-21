@@ -56,11 +56,12 @@
       "plugin": "@nx/jest/plugin",
       "options": {
         "targetName": "test"
-      }
+      },
+      "exclude": ["e2e/**"]
     }
   ],
   "release": {
-    "projects": ["*", "!@org/source"],
+    "projects": ["*", "!@fennet82/nx-plugins", "!nx-graphify-e2e"],
     "version": {
       "preVersionCommand": "npx nx run-many -t build"
     }
