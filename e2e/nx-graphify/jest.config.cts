@@ -10,13 +10,13 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 module.exports = {
-  displayName: 'e2e',
-  preset: '../jest.preset.js',
+  displayName: 'nx-graphify-e2e',
+  preset: '../../jest.preset.js',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
-  globalSetup: '../tools/scripts/start-local-registry.ts',
-  globalTeardown: '../tools/scripts/stop-local-registry.ts',
+  globalSetup: '../../tools/scripts/start-local-registry.ts',
+  globalTeardown: '../../tools/scripts/stop-local-registry.ts',
 };

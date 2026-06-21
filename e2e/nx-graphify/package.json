@@ -1,10 +1,10 @@
 {
-  "name": "e2e",
+  "name": "nx-graphify-e2e",
   "version": "0.0.0-e2e",
   "private": true,
   "nx": {
     "projectType": "application",
-    "sourceRoot": "e2e/src",
+    "sourceRoot": "e2e/nx-graphify/src",
     "implicitDependencies": [
       "@fennet82/nx-graphify"
     ],
@@ -15,7 +15,7 @@
           "{projectRoot}/test-output/jest/coverage"
         ],
         "options": {
-          "jestConfig": "e2e/jest.config.cts",
+          "jestConfig": "e2e/nx-graphify/jest.config.cts",
           "runInBand": true
         },
         "dependsOn": [
