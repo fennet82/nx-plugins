@@ -9,7 +9,7 @@ as a self-inferring plugin.
 ```
 packages/nx-graphify/   the published plugin (@fennet82/nx-graphify)
   src/
-    executors/          graphify, graphify-workspace, purge
+    executors/          graphify, purge
     generators/         init, uninstall-agents
     plugin/             createNodes target inference
     utils/              shared CLI-arg building, agent/backend enums
@@ -33,18 +33,17 @@ Register the plugin in your `nx.json`:
 }
 ```
 
-This infers:
-
-- a `graphify` target on every project
-- a `graphify-workspace` target on the workspace root only
-- a `purge` target on every project, including the workspace root
+This infers a `graphify` target and a `purge` target on every project —
+including the workspace root, since a root `package.json` (which every Nx
+workspace has, if only to depend on its own plugins) makes the root a
+project too. There's no separate "whole workspace" target: running
+`graphify`/`purge` on the root project already covers that case.
 
 ## Commands
 
 | Command                                                      | What it runs                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------------ |
 | `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags]`                                   |
-| `nx run <root>:graphify-workspace`                           | `graphify <workspaceRoot> [flags]`                                 |
 | `nx run <project>:purge`                                     | `graphify uninstall --project --purge` (cwd = that project's root) |
 | `nx g @fennet82/nx-graphify:init --installAgent=claude`      | `graphify install --project --platform claude`                     |
 | `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude`                   |
@@ -54,8 +53,8 @@ pass graphify's `--project` flag (graphify's own project-vs-global install
 distinction). `purge` can run on any project or the workspace root, since
 each cleans only that project's own `graphify-out` directory.
 
-Extraction targets (`graphify`/`graphify-workspace`) also accept a nested
-`provider` option to select an LLM backend:
+The `graphify` target also accepts a nested `provider` option to select an
+LLM backend:
 
 ```json
 {

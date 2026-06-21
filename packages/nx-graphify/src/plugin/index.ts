@@ -65,15 +65,6 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
           },
         };
 
-        if (projectRoot === '.') {
-          targets['graphify-workspace'] = {
-            executor: '@fennet82/nx-graphify:graphify-workspace',
-            options: resolvedOptions,
-            outputs: [`{workspaceRoot}/${resolvedOptions.outputDir}`],
-            cache: true,
-          };
-        }
-
         return {
           projects: {
             [projectRoot]: { targets },

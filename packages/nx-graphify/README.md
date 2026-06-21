@@ -43,8 +43,11 @@ registers the plugin in `nx.json` for you automatically, with no `options`,
 if it isn't already there. Either way works; use the manual JSON above if
 you also want to set workspace-wide options right away.
 
-That's it — every project automatically gets `graphify` and `purge` targets,
-and the workspace root additionally gets a `graphify-workspace` target. No
+That's it — every project automatically gets `graphify` and `purge`
+targets, including the workspace root: a root `package.json` (which every
+Nx workspace has, if only to depend on its own plugins) makes the root a
+project too, so there's no separate "whole workspace" target — running
+`graphify`/`purge` on the root project already covers that case. No
 generator, no per-project scaffolding.
 
 The plugin's `options` block sets workspace-wide defaults — any option from
@@ -88,7 +91,9 @@ also pushes to Neo4j and skips HTML generation:
 }
 ```
 
-This works the same way for `graphify-workspace` and `purge`.
+This works the same way for `purge`, and for the root project too — its
+`project.json`/`package.json` can override options just like any other
+project's.
 
 ### AI coding assistant skills
 
@@ -147,22 +152,15 @@ nx run my-app:graphify --clusterOnly
 nx run my-app:graphify --svg --graphml
 ```
 
-### `graphify-workspace` (whole monorepo)
+To run extraction across the entire monorepo in one shot, run `graphify` on
+the root project — every Nx workspace has a root `package.json` (if only to
+depend on its own plugins), so the root is always a project too:
 
-Automatically attached to the workspace root once the plugin is registered
-in `nx.json` (see [Setup](#setup)) — same options, same caching behavior as
-`graphify`, just run once across the entire workspace from the repo root
-instead of once per project.
+```bash
+nx run my-workspace:graphify
+```
 
-If your workspace root itself has a `package.json` (true for most
-workspaces, including this one), it's also a project in Nx's graph and gets
-its own `graphify` target alongside `graphify-workspace`. Running `graphify`
-on that root project is functionally identical to `graphify-workspace` —
-both end up invoking Graphify against the workspace root with the same cwd,
-verified by diffing their actual CLI invocations. `graphify-workspace`
-exists as the explicit, always-present entry point for "run across the
-whole repo," independent of whether the root happens to be a recognized
-project.
+(replace `my-workspace` with whatever `name` your root `package.json` has)
 
 ### `purge` (per project, including workspace root)
 

@@ -5,11 +5,6 @@
       "schema": "./dist/executors/graphify/schema.json",
       "description": "Run Graphify on a single Nx project"
     },
-    "graphify-workspace": {
-      "implementation": "./dist/executors/graphify-workspace/executor",
-      "schema": "./dist/executors/graphify-workspace/schema.json",
-      "description": "Run Graphify on the entire workspace"
-    },
     "purge": {
       "implementation": "./dist/executors/purge/executor",
       "schema": "./dist/executors/purge/schema.json",

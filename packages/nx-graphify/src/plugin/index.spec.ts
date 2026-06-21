@@ -62,7 +62,7 @@ describe('createNodes', () => {
     expect(projectRoots.sort()).toEqual(['apps/foo', 'libs/bar']);
   });
 
-  it('attaches graphify-workspace only at the workspace root', async () => {
+  it('attaches a graphify target to the workspace root the same way as any other project', async () => {
     const result = await createNodesFunction(
       ['package.json', 'apps/foo/project.json'],
       {},
@@ -73,15 +73,13 @@ describe('createNodes', () => {
       result.flatMap(([, { projects }]) => Object.entries(projects ?? {})),
     );
 
-    expect(projectsByRoot['.'].targets!['graphify-workspace']).toEqual({
-      executor: '@fennet82/nx-graphify:graphify-workspace',
+    expect(projectsByRoot['.'].targets!.graphify).toEqual({
+      executor: '@fennet82/nx-graphify:graphify',
       options: { outputDir: 'graphify-out', mode: 'normal' },
-      outputs: ['{workspaceRoot}/graphify-out'],
+      inputs: ['default', '^default'],
+      outputs: ['{projectRoot}/graphify-out'],
       cache: true,
     });
-    expect(
-      projectsByRoot['apps/foo'].targets!['graphify-workspace'],
-    ).toBeUndefined();
   });
 
   it('only emits executor strings that are registered in executors.json', async () => {
