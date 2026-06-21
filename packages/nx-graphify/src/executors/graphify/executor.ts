@@ -1,6 +1,7 @@
 import type { ExecutorContext, PromiseExecutor } from '@nx/devkit';
 import { logger } from '@nx/devkit';
-import { assertGraphifyInstalled, runGraphifyCommand } from '../../utils/run-graphify';
+import { execSync } from 'child_process';
+import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import { buildGraphifyArgs } from '../../utils/build-args';
 import type { GraphifyExecutorSchema } from './schema';
 
@@ -8,15 +9,21 @@ const runExecutor: PromiseExecutor<GraphifyExecutorSchema> = async (
   options,
   context: ExecutorContext
 ) => {
-  assertGraphifyInstalled();
+  if (!checkGraphifyInstalled()) {
+    throw new Error(
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install'
+    );
+  }
 
   const projectName = context.projectName as string;
   const projectRoot = context.projectsConfigurations.projects[projectName].root;
   const args = buildGraphifyArgs(options, projectRoot, projectName);
   const command = `graphify ${args.join(' ')}`;
 
+  logger.info(`Running: ${command}`);
+
   try {
-    runGraphifyCommand(command, { cwd: context.root });
+    execSync(command, { stdio: 'inherit', cwd: context.root });
     return { success: true };
   } catch (error) {
     logger.error((error as Error).message);

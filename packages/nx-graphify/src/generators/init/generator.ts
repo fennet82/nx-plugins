@@ -1,12 +1,17 @@
 import { logger, type Tree } from '@nx/devkit';
-import { assertGraphifyInstalled, runGraphifyCommand } from '../../utils/run-graphify';
+import { execSync } from 'child_process';
+import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { InitGeneratorSchema } from './schema';
 
 export default async function initGenerator(
   tree: Tree,
   options: InitGeneratorSchema,
 ) {
-  assertGraphifyInstalled();
+  if (!checkGraphifyInstalled()) {
+    throw new Error(
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
+    );
+  }
 
   const installAgents = options.installAgent ?? [];
   if (installAgents.length === 0) {
@@ -16,5 +21,6 @@ export default async function initGenerator(
   }
 
   const command = `graphify install --project --platforms ${installAgents.join('|')}`;
-  runGraphifyCommand(command);
+  logger.info(`Running: ${command}`);
+  execSync(command, { stdio: 'inherit' });
 }

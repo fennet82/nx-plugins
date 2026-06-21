@@ -1,12 +1,17 @@
-import { type Tree } from '@nx/devkit';
-import { assertGraphifyInstalled, runGraphifyCommand } from '../../utils/run-graphify';
+import { logger, type Tree } from '@nx/devkit';
+import { execSync } from 'child_process';
+import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { UninstallAgentsGeneratorSchema } from './schema';
 
 export default async function uninstallAgentsGenerator(
   tree: Tree,
   options: UninstallAgentsGeneratorSchema,
 ) {
-  assertGraphifyInstalled();
+  if (!checkGraphifyInstalled()) {
+    throw new Error(
+      'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
+    );
+  }
 
   const agents = options.agent ?? [];
   if (agents.length === 0) {
@@ -16,5 +21,6 @@ export default async function uninstallAgentsGenerator(
   }
 
   const command = `graphify uninstall --project --platform ${agents.join('|')}`;
-  runGraphifyCommand(command);
+  logger.info(`Running: ${command}`);
+  execSync(command, { stdio: 'inherit' });
 }
