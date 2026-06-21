@@ -102,6 +102,14 @@ If you see `401`/`403` errors from npm during publish:
 2. Confirm the token has write access to `@fennet82/nx-graphify`
 3. Verify the package exists on npmjs.com (first publish must be done manually if the package name has never been published before)
 
+### "Can't generate provenance for new or private package"
+
+Scoped packages (`@fennet82/...`) default to npm's `restricted` access
+unless told otherwise. The top-level `nx release` command doesn't expose
+an `--access` flag, so this is set in each package's own `package.json`
+via `publishConfig.access: "public"` instead — check that field is
+present if you see this error for a new package.
+
 ### Push Errors During Versioning
 
 If the git push (`release.git.push` in `nx.json`) fails:
