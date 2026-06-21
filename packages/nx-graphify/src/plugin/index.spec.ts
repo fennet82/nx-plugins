@@ -111,4 +111,39 @@ describe('createNodes', () => {
       expect(registeredExecutorKeys).toContain(executorKey);
     }
   });
+
+  it('attaches an uncached purge target to every matched project, including workspace root', async () => {
+    const result = await createNodesFunction(
+      ['package.json', 'apps/foo/project.json'],
+      {},
+      fakeContext()
+    );
+
+    const projectsByRoot = Object.fromEntries(
+      result.flatMap(([, { projects }]) => Object.entries(projects ?? {}))
+    );
+
+    expect(projectsByRoot['.'].targets!.purge).toEqual({
+      executor: 'nx-graphify:purge',
+      options: { outputDir: 'graphify-out' },
+    });
+    expect(projectsByRoot['apps/foo'].targets!.purge).toEqual({
+      executor: 'nx-graphify:purge',
+      options: { outputDir: 'graphify-out' },
+    });
+  });
+
+  it('uses the resolved outputDir override for the purge target options', async () => {
+    const result = await createNodesFunction(
+      ['apps/foo/project.json'],
+      { outputDir: 'custom-out' },
+      fakeContext()
+    );
+
+    const [, { projects }] = result[0];
+    expect(projects!['apps/foo'].targets!.purge).toEqual({
+      executor: 'nx-graphify:purge',
+      options: { outputDir: 'custom-out' },
+    });
+  });
 });

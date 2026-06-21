@@ -23,6 +23,7 @@ export function resolveGraphifyOptions(
     ...(pluginOptions.graphml !== undefined && { graphml: pluginOptions.graphml }),
     ...(pluginOptions.neo4j !== undefined && { neo4j: pluginOptions.neo4j }),
     ...(pluginOptions.neo4jPush !== undefined && { neo4jPush: pluginOptions.neo4jPush }),
+    ...(pluginOptions.provider !== undefined && { provider: pluginOptions.provider }),
   };
 }
 
@@ -45,6 +46,10 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
             inputs: ['default', '^default'],
             outputs: [`{projectRoot}/${resolvedOptions.outputDir}`],
             cache: true,
+          },
+          purge: {
+            executor: 'nx-graphify:purge',
+            options: { outputDir: resolvedOptions.outputDir },
           },
         };
 
