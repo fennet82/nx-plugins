@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
-import { logger, type Tree } from '@nx/devkit';
+import { logger, readNxJson, updateNxJson, type Tree } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import initGenerator from './generator';
@@ -97,6 +97,40 @@ describe('init generator', () => {
     expect(infoSpy).toHaveBeenCalledWith(
       'Running: graphify install --project --platform claude',
     );
+  });
+
+  it('registers the plugin in nx.json regardless of installAgent', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+    await initGenerator(tree, {});
+
+    expect(readNxJson(tree)?.plugins).toContain('@fennet82/nx-graphify/plugin');
+  });
+
+  it('does not duplicate the plugin in nx.json if already registered as a string', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const nxJson = readNxJson(tree)!;
+    nxJson.plugins = ['@fennet82/nx-graphify/plugin'];
+    updateNxJson(tree, nxJson);
+
+    await initGenerator(tree, { installAgent: ['claude'] });
+
+    expect(readNxJson(tree)?.plugins).toEqual(['@fennet82/nx-graphify/plugin']);
+  });
+
+  it('does not duplicate the plugin in nx.json if already registered as an object', async () => {
+    (checkGraphifyInstalled as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const nxJson = readNxJson(tree)!;
+    nxJson.plugins = [
+      { plugin: '@fennet82/nx-graphify/plugin', options: { mode: 'deep' } },
+    ];
+    updateNxJson(tree, nxJson);
+
+    await initGenerator(tree, { installAgent: ['claude'] });
+
+    expect(readNxJson(tree)?.plugins).toEqual([
+      { plugin: '@fennet82/nx-graphify/plugin', options: { mode: 'deep' } },
+    ]);
   });
 
   it('propagates the error when the install command fails', async () => {

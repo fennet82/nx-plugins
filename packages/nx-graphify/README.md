@@ -37,6 +37,12 @@ Register the plugin in your workspace's `nx.json`:
 }
 ```
 
+Or just run `nx g @fennet82/nx-graphify:init` (see
+[AI coding assistant skills](#ai-coding-assistant-skills) below) — it
+registers the plugin in `nx.json` for you automatically, with no `options`,
+if it isn't already there. Either way works; use the manual JSON above if
+you also want to set workspace-wide options right away.
+
 That's it — every project automatically gets `graphify` and `purge` targets,
 and the workspace root additionally gets a `graphify-workspace` target. No
 generator, no per-project scaffolding.
@@ -99,6 +105,11 @@ project-vs-global install flag — this plugin always passes it, so the
 skills are installed for this workspace, not globally for your user
 account. If you omit `--installAgent`, it runs `graphify install --project`
 with no `--platform` flag at all.
+
+Either way, `init` also registers `@fennet82/nx-graphify/plugin` in your
+`nx.json` if it isn't already there — regardless of whether you passed
+`--installAgent`. If it's already registered (as a plain string or as an
+object with `options`), `init` leaves it untouched.
 
 To remove agent skills again:
 

@@ -1,7 +1,9 @@
-import { logger, type Tree } from '@nx/devkit';
+import { logger, readNxJson, updateNxJson, type Tree } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import type { InitGeneratorSchema } from './schema';
+
+const PLUGIN_PATH = '@fennet82/nx-graphify/plugin';
 
 export default async function initGenerator(
   tree: Tree,
@@ -12,6 +14,8 @@ export default async function initGenerator(
       'graphify CLI not found. See installation instructions at: https://github.com/safishamsi/graphify#install',
     );
   }
+
+  registerPlugin(tree);
 
   let command = 'graphify install --project';
   const installAgents = options.installAgent ?? [];
@@ -25,4 +29,24 @@ export default async function initGenerator(
 
   logger.info(`Running: ${command}`);
   execSync(command, { stdio: 'inherit' });
+}
+
+function registerPlugin(tree: Tree) {
+  const nxJson = readNxJson(tree);
+  if (!nxJson) {
+    return;
+  }
+
+  const plugins = nxJson.plugins ?? [];
+  const alreadyRegistered = plugins.some((plugin) =>
+    typeof plugin === 'string'
+      ? plugin === PLUGIN_PATH
+      : plugin.plugin === PLUGIN_PATH,
+  );
+  if (alreadyRegistered) {
+    return;
+  }
+
+  nxJson.plugins = [...plugins, PLUGIN_PATH];
+  updateNxJson(tree, nxJson);
 }
