@@ -3,12 +3,12 @@
     "init": {
       "factory": "./dist/generators/init/generator",
       "schema": "./dist/generators/init/schema.json",
-      "description": "Install Graphify skills for one or more AI coding assistants"
+      "description": "Register the Graphify plugin in nx.json"
     },
-    "uninstall-agents": {
-      "factory": "./dist/generators/uninstall-agents/generator",
-      "schema": "./dist/generators/uninstall-agents/schema.json",
-      "description": "Uninstall Graphify skills for one or more AI coding assistants"
+    "agents": {
+      "factory": "./dist/generators/agents/generator",
+      "schema": "./dist/generators/agents/schema.json",
+      "description": "Install or uninstall Graphify skills for one or more AI coding assistants"
     }
   }
 }

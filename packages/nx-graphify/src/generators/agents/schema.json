@@ -1,12 +1,18 @@
 {
   "$schema": "https://json-schema.org/schema",
-  "$id": "NxGraphifyUninstallAgents",
-  "title": "Uninstall AI assistant skills for Graphify",
+  "$id": "NxGraphifyAgents",
+  "title": "Install or uninstall AI assistant skills for Graphify",
   "type": "object",
   "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["install", "uninstall"],
+      "description": "Whether to install or uninstall agent skills.",
+      "$default": { "$source": "argv", "index": 0 }
+    },
     "agent": {
       "type": "array",
-      "description": "Run `graphify uninstall --project --platform <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--agent=claude --agent=cursor).",
+      "description": "Run `graphify <action> --project --platform <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--agent=claude --agent=cursor). Required for `uninstall`; if omitted for `install`, runs `graphify install --project` with no --platform flag.",
       "items": {
         "type": "string",
         "enum": [
@@ -37,5 +43,5 @@
       "default": []
     }
   },
-  "required": []
+  "required": ["action"]
 }

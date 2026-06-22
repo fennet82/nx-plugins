@@ -1,11 +1,11 @@
 import { logger, type Tree } from '@nx/devkit';
 import { execSync } from 'child_process';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
-import type { UninstallAgentsGeneratorSchema } from './schema';
+import type { AgentsGeneratorSchema } from './schema';
 
-export default async function uninstallAgentsGenerator(
-  tree: Tree,
-  options: UninstallAgentsGeneratorSchema,
+export default async function agentsGenerator(
+  _tree: Tree,
+  options: AgentsGeneratorSchema,
 ) {
   if (!checkGraphifyInstalled()) {
     throw new Error(
@@ -13,11 +13,18 @@ export default async function uninstallAgentsGenerator(
     );
   }
 
-  let command = 'graphify uninstall --project';
   const agents = options.agent ?? [];
-  if (agents.length === 0) {
+
+  if (options.action === 'uninstall' && agents.length === 0) {
     throw new Error(
       'You must specify at least one --agent (e.g. --agent=claude --agent=cursor).',
+    );
+  }
+
+  let command = `graphify ${options.action} --project`;
+  if (agents.length === 0) {
+    logger.warn(
+      "You didn't specify an agent. You can use --agent (e.g. --agent=claude --agent=cursor), or run graphify install manually (e.g. `graphify install --platforms claude|cursor|...`).",
     );
   } else {
     command = `${command} --platform ${agents.join('|')}`;

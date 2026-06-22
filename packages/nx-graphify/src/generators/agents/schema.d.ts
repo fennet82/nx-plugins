@@ -1,5 +1,6 @@
 import type { InstallAgent } from '../../utils/types';
 
-export interface UninstallAgentsGeneratorSchema {
+export interface AgentsGeneratorSchema {
+  action: 'install' | 'uninstall';
   agent?: InstallAgent[];
 }
