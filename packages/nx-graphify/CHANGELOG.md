@@ -1,3 +1,52 @@
+## 0.5.0 (2026-06-22)
+
+### 🚀 Features
+
+- ⚠️ **nx-graphify:** rename gen target to extract, adopt \*GraphifyTargetName option convention, default init to bare-string options ([26c7841](https://github.com/fennet82/nx-plugins/commit/26c7841))
+- ⚠️ **nx-graphify:** replace uninstall-agents with unified agents generator ([b235949](https://github.com/fennet82/nx-plugins/commit/b235949))
+- ⚠️ **nx-graphify:** init only registers the plugin, warns if graphify is missing ([3ecb6d0](https://github.com/fennet82/nx-plugins/commit/3ecb6d0))
+- ⚠️ **nx-graphify:** replace executors with command-based targets ([1d0f8ae](https://github.com/fennet82/nx-plugins/commit/1d0f8ae))
+
+### 🩹 Fixes
+
+- **nx-graphify:** address final review findings ([db35de8](https://github.com/fennet82/nx-plugins/commit/db35de8))
+- **nx-graphify:** make GraphifyTargetOptions.name optional on input ([876e4b8](https://github.com/fennet82/nx-plugins/commit/876e4b8))
+
+### ⚠️ Breaking Changes
+
+- **nx-graphify:** rename gen target to extract, adopt \*GraphifyTargetName option convention, default init to bare-string options ([26c7841](https://github.com/fennet82/nx-plugins/commit/26c7841))
+  the plugin option keys are renamed (see above), and
+  the default extraction target is now `graphify:extract` instead of
+  `graphify:gen`. Update nx.json plugin options and any project.json
+  target overrides accordingly. Re-run `nx g @fennet82/nx-graphify:init`
+  or run `nx g @fennet82/nx-graphify:init` again to get the
+  updated defaults written for you.
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+- **nx-graphify:** replace uninstall-agents with unified agents generator ([b235949](https://github.com/fennet82/nx-plugins/commit/b235949))
+  the uninstall-agents generator is removed. Use
+  `nx g @fennet82/nx-graphify:agents uninstall --agent=<agent>` instead.
+  Use `nx g @fennet82/nx-graphify:agents install --agent=<agent>` in
+  place of init's old --installAgent option.
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+- **nx-graphify:** init only registers the plugin, warns if graphify is missing ([3ecb6d0](https://github.com/fennet82/nx-plugins/commit/3ecb6d0))
+  init no longer accepts --installAgent and no longer
+  runs `graphify install`. Use the new `agents` generator instead:
+  `nx g @fennet82/nx-graphify:agents install --agent=claude`.
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+- **nx-graphify:** replace executors with command-based targets ([1d0f8ae](https://github.com/fennet82/nx-plugins/commit/1d0f8ae))
+  the graphify and purge executors are removed, along
+  with the mode/provider/noViz/wiki/obsidian/svg/graphml/neo4j/
+  neo4jPush/update/clusterOnly options (several of which were already
+  silently no-ops against the real graphify CLI). Configure targets via
+  genTarget/updateTarget/queryTarget/pathTarget/explainTarget/prsTarget/
+  purgeTarget plugin options instead, passing graphify flags as args.
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+### ❤️ Thank You
+
+- Claude Sonnet 4.6
+- elad cohen @fennet82
+
 ## 0.4.0 (2026-06-21)
 
 ### 🚀 Features
