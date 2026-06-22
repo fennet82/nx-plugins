@@ -5,7 +5,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/fennet82/nx-plugins/blob/main/packages/nx-graphify",
+  "homepage": "https://github.com/fennet82/nx-plugins/blob/master/packages/nx-graphify",
   "license": "MIT",
   "author": {
     "name": "elad cohen"
