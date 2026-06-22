@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { logger, readNxJson, updateNxJson, type Tree } from '@nx/devkit';
+import { DEFAULT_TARGET_NAMES } from '../../plugin';
 import { checkGraphifyInstalled } from '../../utils/check-graphify';
 import initGenerator from './generator';
 
@@ -9,13 +10,13 @@ vi.mock('../../utils/check-graphify', () => ({
 }));
 
 const DEFAULT_PLUGIN_OPTIONS = {
-  genTarget: { name: 'graphify:gen' },
-  updateTarget: { name: 'graphify:update' },
-  queryTarget: { name: 'graphify:query' },
-  pathTarget: { name: 'graphify:path' },
-  explainTarget: { name: 'graphify:explain' },
-  prsTarget: { name: 'graphify:prs' },
-  purgeTarget: { name: 'graphify:purge' },
+  genTarget: { name: DEFAULT_TARGET_NAMES.genTarget },
+  updateTarget: { name: DEFAULT_TARGET_NAMES.updateTarget },
+  queryTarget: { name: DEFAULT_TARGET_NAMES.queryTarget },
+  pathTarget: { name: DEFAULT_TARGET_NAMES.pathTarget },
+  explainTarget: { name: DEFAULT_TARGET_NAMES.explainTarget },
+  prsTarget: { name: DEFAULT_TARGET_NAMES.prsTarget },
+  purgeTarget: { name: DEFAULT_TARGET_NAMES.purgeTarget },
 };
 
 describe('init generator', () => {

@@ -9,6 +9,16 @@ import type { GraphifyPluginOptions, GraphifyTargetOptions } from './schema';
 
 const GRAPHIFY_CONFIG_GLOB = '{**/project.json,**/package.json}';
 
+export const DEFAULT_TARGET_NAMES = {
+  genTarget: 'graphify:gen',
+  updateTarget: 'graphify:update',
+  queryTarget: 'graphify:query',
+  pathTarget: 'graphify:path',
+  explainTarget: 'graphify:explain',
+  prsTarget: 'graphify:prs',
+  purgeTarget: 'graphify:purge',
+} as const;
+
 type NormalizedGraphifyTargetOptions = GraphifyTargetOptions & {
   name: string;
 };
@@ -40,13 +50,34 @@ export function normalizePluginOptions(
   options: GraphifyPluginOptions = {},
 ): NormalizedGraphifyPluginOptions {
   return {
-    genTarget: normalizeTarget(options.genTarget, 'graphify:gen'),
-    updateTarget: normalizeTarget(options.updateTarget, 'graphify:update'),
-    queryTarget: normalizeTarget(options.queryTarget, 'graphify:query'),
-    pathTarget: normalizeTarget(options.pathTarget, 'graphify:path'),
-    explainTarget: normalizeTarget(options.explainTarget, 'graphify:explain'),
-    prsTarget: normalizeTarget(options.prsTarget, 'graphify:prs'),
-    purgeTarget: normalizeTarget(options.purgeTarget, 'graphify:purge'),
+    genTarget: normalizeTarget(
+      options.genTarget,
+      DEFAULT_TARGET_NAMES.genTarget,
+    ),
+    updateTarget: normalizeTarget(
+      options.updateTarget,
+      DEFAULT_TARGET_NAMES.updateTarget,
+    ),
+    queryTarget: normalizeTarget(
+      options.queryTarget,
+      DEFAULT_TARGET_NAMES.queryTarget,
+    ),
+    pathTarget: normalizeTarget(
+      options.pathTarget,
+      DEFAULT_TARGET_NAMES.pathTarget,
+    ),
+    explainTarget: normalizeTarget(
+      options.explainTarget,
+      DEFAULT_TARGET_NAMES.explainTarget,
+    ),
+    prsTarget: normalizeTarget(
+      options.prsTarget,
+      DEFAULT_TARGET_NAMES.prsTarget,
+    ),
+    purgeTarget: normalizeTarget(
+      options.purgeTarget,
+      DEFAULT_TARGET_NAMES.purgeTarget,
+    ),
   };
 }
 

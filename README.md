@@ -52,7 +52,8 @@ workspace root): `graphify:gen`, `graphify:update`, `graphify:query`,
 `graphify:path`, `graphify:explain`, `graphify:prs`, `graphify:purge`. Each
 target's name and its `args`/`env`/`cwd` are configurable — see
 [packages/nx-graphify/README.md](./packages/nx-graphify/README.md) for the
-full reference.
+full reference. Note that per-configuration overrides replace rather than
+merge with a target's base `args`/`env`/`envFile`/`cwd`.
 
 ## Commands
 

@@ -198,6 +198,10 @@ Now every project's extraction target is `nx run my-app:extract` instead of
 nx run my-app:graphify:gen:ci
 ```
 
+A configuration's `args`/`env`/`envFile`/`cwd` fully replace the parent
+target's values rather than merging with them — so if you want base args
+available in every configuration, repeat them in each configuration block.
+
 ## AI coding assistant skills
 
 ```bash

@@ -59,7 +59,8 @@ describe('nx-graphify', () => {
       join(fakeGraphifyBinDir, 'graphify'),
       [
         '#!/usr/bin/env bash',
-        `echo "$@" >> "${graphifyLogFile}"`,
+        `for a in "$@"; do printf '[%s]' "$a" >> "${graphifyLogFile}"; done`,
+        `printf '\\n' >> "${graphifyLogFile}"`,
         'if [ "$1" = "--version" ]; then echo "graphify-fake 0.0.0"; fi',
         'exit 0',
         '',
@@ -105,7 +106,7 @@ describe('nx-graphify', () => {
     );
 
     expect(readFile(graphifyLogFile)).toContain(
-      'install --project --platform claude',
+      '[install][--project][--platform][claude]',
     );
   });
 
@@ -115,25 +116,27 @@ describe('nx-graphify', () => {
     );
 
     expect(readFile(graphifyLogFile)).toContain(
-      'uninstall --project --platform claude',
+      '[uninstall][--project][--platform][claude]',
     );
   });
 
   it('runs `graphify extract . {args}` via the inferred graphify:gen target', async () => {
     await runNxCommandAsync('run sample:graphify:gen');
 
-    expect(readFile(graphifyLogFile)).toContain('extract .');
+    expect(readFile(graphifyLogFile)).toContain('[extract][.]');
   });
 
   it('runs `graphify query {args}` via the inferred graphify:query target, forwarding extra args', async () => {
     await runNxCommandAsync('run sample:graphify:query -- "what does foo do"');
 
-    expect(readFile(graphifyLogFile)).toContain('query what does foo do');
+    expect(readFile(graphifyLogFile)).toContain('[query][what does foo do]');
   });
 
   it('runs `graphify uninstall --project --purge` via the inferred graphify:purge target', async () => {
     await runNxCommandAsync('run sample:graphify:purge');
 
-    expect(readFile(graphifyLogFile)).toContain('uninstall --project --purge');
+    expect(readFile(graphifyLogFile)).toContain(
+      '[uninstall][--project][--purge]',
+    );
   });
 });
