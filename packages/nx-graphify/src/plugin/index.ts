@@ -9,20 +9,24 @@ import type { GraphifyPluginOptions, GraphifyTargetOptions } from './schema';
 
 const GRAPHIFY_CONFIG_GLOB = '{**/project.json,**/package.json}';
 
+type NormalizedGraphifyTargetOptions = GraphifyTargetOptions & {
+  name: string;
+};
+
 interface NormalizedGraphifyPluginOptions {
-  genTarget: GraphifyTargetOptions;
-  updateTarget: GraphifyTargetOptions;
-  queryTarget: GraphifyTargetOptions;
-  pathTarget: GraphifyTargetOptions;
-  explainTarget: GraphifyTargetOptions;
-  prsTarget: GraphifyTargetOptions;
-  purgeTarget: GraphifyTargetOptions;
+  genTarget: NormalizedGraphifyTargetOptions;
+  updateTarget: NormalizedGraphifyTargetOptions;
+  queryTarget: NormalizedGraphifyTargetOptions;
+  pathTarget: NormalizedGraphifyTargetOptions;
+  explainTarget: NormalizedGraphifyTargetOptions;
+  prsTarget: NormalizedGraphifyTargetOptions;
+  purgeTarget: NormalizedGraphifyTargetOptions;
 }
 
 function normalizeTarget(
   target: string | GraphifyTargetOptions | undefined,
   defaultName: string,
-): GraphifyTargetOptions {
+): NormalizedGraphifyTargetOptions {
   if (typeof target === 'string') {
     return { name: target };
   }
@@ -47,7 +51,7 @@ export function normalizePluginOptions(
 }
 
 function buildTargetOptions(
-  target: GraphifyTargetOptions,
+  target: NormalizedGraphifyTargetOptions,
   projectRoot: string,
 ): Record<string, unknown> {
   const options: Record<string, unknown> = {
@@ -66,7 +70,7 @@ function buildTargetOptions(
 }
 
 function buildTargetConfigurations(
-  target: GraphifyTargetOptions,
+  target: NormalizedGraphifyTargetOptions,
   projectRoot: string,
 ): Record<string, unknown> | undefined {
   if (!target.configurations) {
@@ -86,7 +90,7 @@ function buildTargetConfigurations(
 }
 
 function buildCommandTarget(
-  target: GraphifyTargetOptions,
+  target: NormalizedGraphifyTargetOptions,
   projectRoot: string,
   command: string,
   cacheable: boolean,

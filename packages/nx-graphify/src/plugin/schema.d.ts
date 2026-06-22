@@ -1,5 +1,5 @@
 export interface GraphifyTargetOptions {
-  name: string;
+  name?: string;
   args?: string[];
   env?: Record<string, string>;
   envFile?: string;
