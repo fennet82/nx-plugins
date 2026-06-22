@@ -58,6 +58,192 @@ or an object — `{ name, args, env, envFile, cwd, configurations }`. All
 graphify CLI flags are passed straight through as `args`; there's no
 structured schema to keep in sync with graphify's own flags.
 
+## Guides
+
+### Build a graph from scratch
+
+The first run of `graphify:gen` on a project builds its graph from nothing —
+there's no separate "init the graph" step:
+
+```bash
+nx run my-app:graphify:gen
+```
+
+This scans `my-app`'s project root, runs Tree-sitter AST extraction plus LLM
+semantic extraction (see [Setting an LLM backend](#setting-an-llm-backend)
+below), clusters the result, and writes everything to `my-app/graphify-out/`
+(`graph.json`, `manifest.json`, `.graphify_analysis.json`). Building the
+whole workspace's graph in one shot works the same way, since the workspace
+root is a project too:
+
+```bash
+nx run my-workspace:graphify:gen
+```
+
+(replace `my-workspace` with whatever `name` your root `package.json` has).
+To build every project's graph in one command instead of just the root's,
+use `run-many` or `affected`:
+
+```bash
+nx run-many -t graphify:gen
+nx affected -t graphify:gen
+```
+
+`graphify:gen` is cached by Nx — rerunning it with no relevant file changes
+replays the cached result instead of calling `graphify` again.
+
+### Update an existing graph
+
+Once a graph exists, re-running `graphify:gen` rebuilds it from scratch.
+`graphify:update` instead re-extracts only the files that changed since the
+last build and merges the result into the existing graph — cheaper, and
+skips the LLM step entirely unless you also pass extract-style flags:
+
+```bash
+nx run my-app:graphify:update
+```
+
+Use `--force` to overwrite `graph.json` even if the incremental rebuild
+ends up with fewer nodes than before (useful right after a refactor that
+deletes a lot of code, where "fewer nodes" is expected and correct, not a
+sign of a broken rebuild):
+
+```bash
+nx run my-app:graphify:update -- --force
+```
+
+Like `graphify:gen`, `graphify:update` is cached, and works the same way
+against the workspace root or via `run-many`/`affected`.
+
+### Setting an LLM backend
+
+`genTarget`/`updateTarget` extraction needs an LLM backend for semantic
+(non-AST) analysis. graphify auto-detects a backend from whichever API key
+is set in the environment — no `--backend` flag needed if exactly one of
+these is set:
+
+| Backend    | Env var(s)                                       |
+| ---------- | ------------------------------------------------ |
+| `openai`   | `OPENAI_API_KEY`                                 |
+| `claude`   | `ANTHROPIC_API_KEY`                              |
+| `gemini`   | `GEMINI_API_KEY` or `GOOGLE_API_KEY`             |
+| `deepseek` | `DEEPSEEK_API_KEY`                               |
+| `kimi`     | `MOONSHOT_API_KEY`                               |
+| `azure`    | `AZURE_OPENAI_API_KEY` + `AZURE_OPENAI_ENDPOINT` |
+| `ollama`   | `OLLAMA_BASE_URL` (+ optional `OLLAMA_API_KEY`)  |
+
+To pin a specific backend/model instead of relying on auto-detection, pass
+`--backend`/`--model` as `args`:
+
+```json
+{
+  "name": "my-app",
+  "targets": {
+    "graphify:gen": {
+      "options": {
+        "args": ["--backend", "openai", "--model", "gpt-4"]
+      }
+    }
+  }
+}
+```
+
+### Setting environment variables
+
+Don't put API keys directly in `args` or in `nx.json`/`project.json` (they'd
+end up committed to git). Use the target's `env` or `envFile` option
+instead — both are passed straight through to Nx's `command` executor:
+
+```json
+{
+  "plugins": [
+    {
+      "plugin": "@fennet82/nx-graphify/plugin",
+      "options": {
+        "genTarget": {
+          "name": "graphify:gen",
+          "env": { "GRAPHIFY_MAX_WORKERS": "4" }
+        }
+      }
+    }
+  ]
+}
+```
+
+`env` is a plain key-value map merged into the command's environment.
+`envFile` instead points at a dotenv-style file (each line `KEY=value`) that
+Nx loads before running the command — the usual place to keep an API key out
+of version control:
+
+```json
+{
+  "name": "my-app",
+  "targets": {
+    "graphify:gen": {
+      "options": {
+        "envFile": ".env.graphify"
+      }
+    }
+  }
+}
+```
+
+```
+# .env.graphify (gitignored)
+OPENAI_API_KEY=sk-...
+```
+
+### Overriding the global config in nx.json
+
+The `options` block under the plugin registration in `nx.json` sets
+workspace-wide defaults for all 7 targets. Override it at three different
+scopes, depending on how broadly the change should apply:
+
+- **Workspace-wide** — edit the plugin's `options` in `nx.json` directly
+  (affects every project):
+
+  ```json
+  {
+    "plugins": [
+      {
+        "plugin": "@fennet82/nx-graphify/plugin",
+        "options": {
+          "genTarget": { "name": "graphify:gen", "args": ["--mode", "deep"] }
+        }
+      }
+    ]
+  }
+  ```
+
+- **Per project** — add the target to that project's `project.json` (or the
+  `nx` key in its `package.json`); see
+  [Overriding options per project](#overriding-options-per-project) below.
+
+- **Per invocation** — pass flags on the command line after `--`, without
+  touching any config file at all:
+
+  ```bash
+  nx run my-app:graphify:gen -- --mode deep
+  ```
+
+These three scopes behave differently, and it matters which one you reach
+for:
+
+- **Per-invocation flags genuinely layer on top of configured `args`.** Nx's
+  `command` executor concatenates whatever follows `--` on the CLI with the
+  target's own configured `args`, so `nx run my-app:graphify:gen -- --mode deep`
+  runs with both the configured args _and_ `--mode deep`.
+- **Per-project `project.json` options replace, not merge.** If `nx.json`
+  configures `genTarget.args: ['--mode', 'deep']` workspace-wide and a
+  project's `project.json` sets its own `args: ['--backend', 'openai']` for
+  `graphify:gen`, that project runs with `--backend openai` only — `--mode
+deep` is gone, since Nx replaces array-valued options wholesale rather
+  than concatenating them when merging an explicit project target over an
+  inferred one. If you need both, repeat every flag you want in the
+  project-level `args`.
+- **Target `configurations`** behave the same way — see
+  [Per-configuration overrides](#per-configuration-overrides) below.
+
 ## Targets
 
 ### `graphify:gen` — `genTarget`
@@ -137,8 +323,7 @@ nx affected -t graphify:purge
 ## Overriding options per project
 
 An individual project can override any target's `args`/`env`/`cwd` by adding
-its own entry to `targets` in `project.json` — Nx merges that over the
-inferred defaults automatically:
+its own entry to `targets` in `project.json`:
 
 ```json
 {
@@ -154,7 +339,10 @@ inferred defaults automatically:
 ```
 
 This works the same way for any of the 7 targets, and for the root project
-too.
+too. Note this fully replaces the workspace-wide `args`/`env`/etc. from
+`nx.json` rather than merging with them — see
+[Overriding the global config in nx.json](#overriding-the-global-config-in-nxjson)
+above for the full breakdown of which override scope merges vs. replaces.
 
 ## Renaming a target
 
