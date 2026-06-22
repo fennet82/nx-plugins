@@ -1,41 +1,8 @@
 {
   "$schema": "https://json-schema.org/schema",
   "$id": "NxGraphifyInit",
-  "title": "Install AI assistant skills for Graphify",
+  "title": "Register the Graphify plugin in nx.json",
   "type": "object",
-  "properties": {
-    "installAgent": {
-      "type": "array",
-      "description": "Run `graphify install --project --platform <a>|<b>|...` for one or more AI coding assistants. Can be repeated (--installAgent=claude --installAgent=cursor). If omitted, runs `graphify install --project` with no --platform flag.",
-      "items": {
-        "type": "string",
-        "enum": [
-          "claude",
-          "codex",
-          "opencode",
-          "kilo",
-          "aider",
-          "copilot",
-          "claw",
-          "droid",
-          "trae",
-          "trae-cn",
-          "hermes",
-          "kiro",
-          "pi",
-          "codebuddy",
-          "antigravity",
-          "antigravity-windows",
-          "windows",
-          "kimi",
-          "amp",
-          "devin",
-          "gemini",
-          "cursor"
-        ]
-      },
-      "default": []
-    }
-  },
+  "properties": {},
   "required": []
 }

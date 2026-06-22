@@ -1,5 +1,1 @@
-import type { InstallAgent } from '../../utils/types';
-
-export interface InitGeneratorSchema {
-  installAgent?: InstallAgent[];
-}
+export type InitGeneratorSchema = Record<string, never>;
