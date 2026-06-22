@@ -1,3 +1,21 @@
-import type { GraphifyExecutorSchema } from '../executors/graphify/schema';
+export interface GraphifyTargetOptions {
+  name: string;
+  args?: string[];
+  env?: Record<string, string>;
+  envFile?: string;
+  cwd?: string;
+  configurations?: Record<
+    string,
+    Omit<GraphifyTargetOptions, 'configurations' | 'name'>
+  >;
+}
 
-export type GraphifyPluginOptions = Partial<GraphifyExecutorSchema>;
+export interface GraphifyPluginOptions {
+  genTarget?: string | GraphifyTargetOptions;
+  updateTarget?: string | GraphifyTargetOptions;
+  queryTarget?: string | GraphifyTargetOptions;
+  pathTarget?: string | GraphifyTargetOptions;
+  explainTarget?: string | GraphifyTargetOptions;
+  prsTarget?: string | GraphifyTargetOptions;
+  purgeTarget?: string | GraphifyTargetOptions;
+}

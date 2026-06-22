@@ -42,7 +42,6 @@
   "files": [
     "dist",
     "!**/*.tsbuildinfo",
-    "executors.json",
     "generators.json"
   ],
   "nx": {
@@ -78,6 +77,5 @@
     "@nx/devkit": "^23.0.0",
     "tslib": "^2.3.0"
   },
-  "executors": "./executors.json",
   "generators": "./generators.json"
 }
