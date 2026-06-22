@@ -43,14 +43,7 @@ describe('nx-graphify', () => {
       dereference: true,
     });
 
-    updateFile('nx.json', (content) => {
-      const json = JSON.parse(content);
-      json.plugins = [...(json.plugins ?? []), '@fennet82/nx-graphify/plugin'];
-      return JSON.stringify(json, null, 2);
-    });
-
-    // A project for the `purge` target to run against (purge is inferred on
-    // every project once the plugin above is registered).
+    // A project for the inferred targets to run against.
     updateFile(
       'libs/sample/package.json',
       JSON.stringify({ name: 'sample', version: '0.0.1' }, null, 2),
@@ -88,9 +81,27 @@ describe('nx-graphify', () => {
     }
   });
 
-  it('runs `graphify install --project --platform <agent>` via the init generator', async () => {
+  it('registers the plugin with all 7 default target names via the init generator', async () => {
+    await runNxCommandAsync('g @fennet82/nx-graphify:init');
+
+    const nxJson = JSON.parse(readFile('nx.json'));
+    const plugin = nxJson.plugins.find(
+      (p: { plugin?: string }) => p?.plugin === '@fennet82/nx-graphify/plugin',
+    );
+    expect(plugin.options).toEqual({
+      genTarget: { name: 'graphify:gen' },
+      updateTarget: { name: 'graphify:update' },
+      queryTarget: { name: 'graphify:query' },
+      pathTarget: { name: 'graphify:path' },
+      explainTarget: { name: 'graphify:explain' },
+      prsTarget: { name: 'graphify:prs' },
+      purgeTarget: { name: 'graphify:purge' },
+    });
+  });
+
+  it('runs `graphify install --project --platform <agent>` via the agents generator', async () => {
     await runNxCommandAsync(
-      'g @fennet82/nx-graphify:init --installAgent=claude',
+      'g @fennet82/nx-graphify:agents install --agent=claude',
     );
 
     expect(readFile(graphifyLogFile)).toContain(
@@ -98,9 +109,9 @@ describe('nx-graphify', () => {
     );
   });
 
-  it('runs `graphify uninstall --project --platform <agent>` via the uninstall-agents generator', async () => {
+  it('runs `graphify uninstall --project --platform <agent>` via the agents generator', async () => {
     await runNxCommandAsync(
-      'g @fennet82/nx-graphify:uninstall-agents --agent=claude',
+      'g @fennet82/nx-graphify:agents uninstall --agent=claude',
     );
 
     expect(readFile(graphifyLogFile)).toContain(
@@ -108,8 +119,20 @@ describe('nx-graphify', () => {
     );
   });
 
-  it('runs `graphify uninstall --project --purge` via the inferred purge target', async () => {
-    await runNxCommandAsync('run sample:purge');
+  it('runs `graphify extract . {args}` via the inferred graphify:gen target', async () => {
+    await runNxCommandAsync('run sample:graphify:gen');
+
+    expect(readFile(graphifyLogFile)).toContain('extract .');
+  });
+
+  it('runs `graphify query {args}` via the inferred graphify:query target, forwarding extra args', async () => {
+    await runNxCommandAsync('run sample:graphify:query -- "what does foo do"');
+
+    expect(readFile(graphifyLogFile)).toContain('query what does foo do');
+  });
+
+  it('runs `graphify uninstall --project --purge` via the inferred graphify:purge target', async () => {
+    await runNxCommandAsync('run sample:graphify:purge');
 
     expect(readFile(graphifyLogFile)).toContain('uninstall --project --purge');
   });
