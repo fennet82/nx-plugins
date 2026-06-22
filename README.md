@@ -9,10 +9,9 @@ as a self-inferring plugin.
 ```
 packages/nx-graphify/   the published plugin (@fennet82/nx-graphify)
   src/
-    executors/          graphify, purge
-    generators/         init, uninstall-agents
-    plugin/             createNodes target inference
-    utils/              shared CLI-arg building, agent/backend enums
+    generators/         init, agents
+    plugin/             createNodes target inference (command-based, no executors)
+    utils/              agent-platform enum, graphify-installed check
 e2e/
   nx-graphify-e2e/       e2e tests for @fennet82/nx-graphify (@nx/plugin/testing)
 docs/superpowers/
@@ -29,48 +28,50 @@ Register the plugin in your `nx.json`:
 
 ```json
 {
-  "plugins": ["@fennet82/nx-graphify/plugin"]
+  "plugins": [
+    {
+      "plugin": "@fennet82/nx-graphify/plugin",
+      "options": {
+        "genTarget": { "name": "graphify:gen" },
+        "updateTarget": { "name": "graphify:update" },
+        "queryTarget": { "name": "graphify:query" },
+        "pathTarget": { "name": "graphify:path" },
+        "explainTarget": { "name": "graphify:explain" },
+        "prsTarget": { "name": "graphify:prs" },
+        "purgeTarget": { "name": "graphify:purge" }
+      }
+    }
+  ]
 }
 ```
 
-This infers a `graphify` target and a `purge` target on every project —
-including the workspace root, since a root `package.json` (which every Nx
-workspace has, if only to depend on its own plugins) makes the root a
-project too. There's no separate "whole workspace" target: running
-`graphify`/`purge` on the root project already covers that case.
+Or run `nx g @fennet82/nx-graphify:init`, which writes the above for you.
+
+This infers 7 command-based targets on every project (including the
+workspace root): `graphify:gen`, `graphify:update`, `graphify:query`,
+`graphify:path`, `graphify:explain`, `graphify:prs`, `graphify:purge`. Each
+target's name and its `args`/`env`/`cwd` are configurable — see
+[packages/nx-graphify/README.md](./packages/nx-graphify/README.md) for the
+full reference.
 
 ## Commands
 
-| Command                                                      | What it runs                                                       |
-| ------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `nx run <project>:graphify`                                  | `graphify <projectRoot> [flags]`                                   |
-| `nx run <project>:purge`                                     | `graphify uninstall --project --purge` (cwd = that project's root) |
-| `nx g @fennet82/nx-graphify:init --installAgent=claude`      | `graphify install --project --platform claude`                     |
-| `nx g @fennet82/nx-graphify:uninstall-agents --agent=claude` | `graphify uninstall --project --platform claude`                   |
+| Command                                                      | What it runs                                                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `nx run <project>:graphify:gen`                              | `graphify extract . [args]`                                                              |
+| `nx run <project>:graphify:update`                           | `graphify update . [args]`                                                               |
+| `nx run <project>:graphify:query -- "<question>"`            | `graphify query "<question>" [args]`                                                     |
+| `nx run <project>:graphify:path -- "A" "B"`                  | `graphify path "A" "B" [args]`                                                           |
+| `nx run <project>:graphify:explain -- "X"`                   | `graphify explain "X" [args]`                                                            |
+| `nx run <project>:graphify:prs`                              | `graphify prs [args]`                                                                    |
+| `nx run <project>:graphify:purge`                            | `graphify uninstall --project --purge [args]` (cwd = that project's root)                |
+| `nx g @fennet82/nx-graphify:init`                            | registers the plugin in `nx.json` (warns, doesn't fail, if graphify isn't installed yet) |
+| `nx g @fennet82/nx-graphify:agents install --agent=claude`   | `graphify install --project --platform claude`                                           |
+| `nx g @fennet82/nx-graphify:agents uninstall --agent=claude` | `graphify uninstall --project --platform claude`                                         |
 
-`init` and `uninstall-agents` always run from the workspace root and always
-pass graphify's `--project` flag (graphify's own project-vs-global install
-distinction). `purge` can run on any project or the workspace root, since
-each cleans only that project's own `graphify-out` directory.
-
-The `graphify` target also accepts a nested `provider` option to select an
-LLM backend:
-
-```json
-{
-  "targets": {
-    "graphify": {
-      "options": {
-        "provider": { "backend": "openai", "model": "gpt-4" }
-      }
-    }
-  }
-}
-```
-
-`provider.backend` is one of `azure`, `bedrock`, `claude`, `claude-cli`,
-`deepseek`, `gemini`, `kimi`, `ollama`, `openai`. `provider.model` is
-free-text and only valid alongside `provider.backend`.
+All graphify-specific configuration (backend, model, mode, etc.) is passed
+as raw CLI args via each target's `args` option — there's no separate typed
+schema to keep in sync with graphify's own flags.
 
 ## Development
 

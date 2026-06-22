@@ -29,28 +29,134 @@ Register the plugin in your workspace's `nx.json`:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "mode": "normal"
+        "genTarget": { "name": "graphify:gen" },
+        "updateTarget": { "name": "graphify:update" },
+        "queryTarget": { "name": "graphify:query" },
+        "pathTarget": { "name": "graphify:path" },
+        "explainTarget": { "name": "graphify:explain" },
+        "prsTarget": { "name": "graphify:prs" },
+        "purgeTarget": { "name": "graphify:purge" }
       }
     }
   ]
 }
 ```
 
-Or just run `nx g @fennet82/nx-graphify:init` (see
-[AI coding assistant skills](#ai-coding-assistant-skills) below) — it
-registers the plugin in `nx.json` for you automatically, with no `options`,
-if it isn't already there. Either way works; use the manual JSON above if
-you also want to set workspace-wide options right away.
+Or just run `nx g @fennet82/nx-graphify:init` — it writes exactly the above
+into `nx.json` for you (skipping if the plugin is already registered, as a
+string or as an object), and warns (without failing) if it can't find the
+`graphify` CLI on your `PATH`.
 
-That's it — every project automatically gets `graphify` and `purge`
-targets, including the workspace root: a root `package.json` (which every
-Nx workspace has, if only to depend on its own plugins) makes the root a
-project too, so there's no separate "whole workspace" target — running
-`graphify`/`purge` on the root project already covers that case. No
-generator, no per-project scaffolding.
+That's it — every project automatically gets all 7 targets below, including
+the workspace root: a root `package.json` (which every Nx workspace has, if
+only to depend on its own plugins) makes the root a project too, so there's
+no separate "whole workspace" target — running any target on the root
+project already covers that case.
 
-The plugin's `options` block sets workspace-wide defaults — any option from
-the [Options](#options) table below. A few more realistic defaults:
+Each plugin option accepts either a plain string (just renames the target)
+or an object — `{ name, args, env, envFile, cwd, configurations }`. All
+graphify CLI flags are passed straight through as `args`; there's no
+structured schema to keep in sync with graphify's own flags.
+
+## Targets
+
+### `graphify:gen` — `genTarget`
+
+Runs `graphify extract . {args}` (cwd = the project's root). Creates
+`graphify-out/` (`graph.json`, `manifest.json`, `.graphify_analysis.json`,
+plus clustering output) and is cached by Nx like any other build target.
+
+```bash
+nx run my-app:graphify:gen
+nx run my-app:graphify:gen -- --backend openai --model gpt-4
+nx run my-app:graphify:gen -- --mode deep --max-workers 4
+```
+
+### `graphify:update` — `updateTarget`
+
+Runs `graphify update . {args}`. Re-extracts changed files only and merges
+into the existing graph — no LLM needed unless you also pass extract-style
+flags. Cached the same way as `graphify:gen`.
+
+```bash
+nx run my-app:graphify:update
+nx run my-app:graphify:update -- --force
+```
+
+### `graphify:query` — `queryTarget`
+
+Runs `graphify query {args}` against the project's `graphify-out/graph.json`.
+Not cached — it's a read, not a build.
+
+```bash
+nx run my-app:graphify:query -- "what calls the auth middleware?"
+nx run my-app:graphify:query -- "what calls the auth middleware?" --dfs --budget 500
+```
+
+### `graphify:path` — `pathTarget`
+
+Runs `graphify path {args}` — shortest path between two nodes in the graph.
+
+```bash
+nx run my-app:graphify:path -- "UserService" "Database"
+```
+
+### `graphify:explain` — `explainTarget`
+
+Runs `graphify explain {args}` — plain-language explanation of a node and
+its neighbors.
+
+```bash
+nx run my-app:graphify:explain -- "UserService.login"
+```
+
+### `graphify:prs` — `prsTarget`
+
+Runs `graphify prs {args}` — a dashboard of open PRs against the repo, with
+optional triage/conflict/graph-impact analysis.
+
+```bash
+nx run my-app:graphify:prs
+nx run my-app:graphify:prs -- --triage
+nx run my-app:graphify:prs -- --conflicts
+```
+
+### `graphify:purge` — `purgeTarget`
+
+Runs `graphify uninstall --project --purge {args}`, scoped to that project's
+own directory. Removes that project's `graphify-out/` directory only — no
+agent skills are touched. Not cached, since deleting output isn't a
+reproducible build step.
+
+```bash
+nx run my-app:graphify:purge
+nx run-many -t graphify:purge
+nx affected -t graphify:purge
+```
+
+## Overriding options per project
+
+An individual project can override any target's `args`/`env`/`cwd` by adding
+its own entry to `targets` in `project.json` — Nx merges that over the
+inferred defaults automatically:
+
+```json
+{
+  "name": "my-app",
+  "targets": {
+    "graphify:gen": {
+      "options": {
+        "args": ["--backend", "ollama", "--model", "llama3"]
+      }
+    }
+  }
+}
+```
+
+This works the same way for any of the 7 targets, and for the root project
+too.
+
+## Renaming a target
 
 ```json
 {
@@ -58,220 +164,73 @@ the [Options](#options) table below. A few more realistic defaults:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "mode": "deep",
-        "svg": true,
-        "wiki": true,
-        "provider": { "backend": "openai", "model": "gpt-4" }
+        "genTarget": "extract"
       }
     }
   ]
 }
 ```
 
-### Overriding options per project
+Now every project's extraction target is `nx run my-app:extract` instead of
+`nx run my-app:graphify:gen`.
 
-An individual project can override the workspace-wide defaults by adding its
-own `targets.graphify.options` to its `project.json` — Nx merges that over
-the inferred defaults automatically. For example, only this one project
-also pushes to Neo4j and skips HTML generation:
+## Per-configuration overrides
 
 ```json
 {
-  "name": "my-app",
-  "targets": {
-    "graphify": {
+  "plugins": [
+    {
+      "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "noViz": true,
-        "neo4j": true,
-        "neo4jPush": "bolt://localhost:7687"
+        "genTarget": {
+          "name": "graphify:gen",
+          "configurations": {
+            "ci": { "args": ["--no-cluster"] }
+          }
+        }
       }
     }
-  }
+  ]
 }
 ```
 
-This works the same way for `purge`, and for the root project too — its
-`project.json`/`package.json` can override options just like any other
-project's.
+```bash
+nx run my-app:graphify:gen:ci
+```
 
-### AI coding assistant skills
+## AI coding assistant skills
 
 ```bash
-nx g @fennet82/nx-graphify:init --installAgent=claude
+nx g @fennet82/nx-graphify:agents install --agent=claude
 # or multiple at once, installed in a single call:
-nx g @fennet82/nx-graphify:init --installAgent=claude --installAgent=cursor
+nx g @fennet82/nx-graphify:agents install --agent=claude --agent=cursor
 ```
 
 This runs `graphify install --project --platform claude|cursor` for you.
-It's a one-time, workspace-root-level operation, unrelated to which
-projects have a `graphify` target. `--project` is graphify's own
-project-vs-global install flag — this plugin always passes it, so the
-skills are installed for this workspace, not globally for your user
-account. If you omit `--installAgent`, it runs `graphify install --project`
-with no `--platform` flag at all.
-
-Either way, `init` also registers `@fennet82/nx-graphify/plugin` in your
-`nx.json` if it isn't already there — regardless of whether you passed
-`--installAgent`. If it's already registered (as a plain string or as an
-object with `options`), `init` leaves it untouched.
+It's a one-time, workspace-root-level operation, unrelated to which projects
+have graphify targets. `--project` is graphify's own project-vs-global
+install flag — this generator always passes it, so the skills are installed
+for this workspace, not globally for your user account. If you omit
+`--agent`, it runs `graphify install --project` with no `--platform` flag at
+all (and logs a warning).
 
 To remove agent skills again:
 
 ```bash
-nx g @fennet82/nx-graphify:uninstall-agents --agent=claude
+nx g @fennet82/nx-graphify:agents uninstall --agent=claude
 # or multiple at once:
-nx g @fennet82/nx-graphify:uninstall-agents --agent=claude --agent=cursor
+nx g @fennet82/nx-graphify:agents uninstall --agent=claude --agent=cursor
 ```
 
-This runs `graphify uninstall --project --platform claude|cursor`. At
-least one `--agent` is required — there's no "uninstall everything" mode;
-say which agents you want removed.
+This runs `graphify uninstall --project --platform claude|cursor`. At least
+one `--agent` is required for `uninstall` — there's no "uninstall
+everything" mode; say which agents you want removed.
 
-## Targets
-
-### `graphify` (per project)
-
-Runs Graphify against a single project's root. Outputs (`graph.html`,
-`graph.json`, `GRAPH_REPORT.md`, and any optional exports) are always
-written to `graphify-out` and are cached by Nx like any other target.
-`options.outputDir` exists in the schema for forward compatibility, but
-graphify doesn't yet support a custom output directory, so it's currently
-fixed to `graphify-out` regardless of what you set.
+## Development
 
 ```bash
-# extract using whatever options are configured (workspace defaults +
-# this project's own project.json overrides, if any)
-nx run my-app:graphify
-
-# re-extract only the files that changed, merging into the existing graph
-nx run my-app:graphify --update
-
-# rerun clustering only, without re-extracting anything
-nx run my-app:graphify --clusterOnly
-
-# one-off ad-hoc export, without changing project.json
-nx run my-app:graphify --svg --graphml
-```
-
-To run extraction across the entire monorepo in one shot, run `graphify` on
-the root project — every Nx workspace has a root `package.json` (if only to
-depend on its own plugins), so the root is always a project too:
-
-```bash
-nx run my-workspace:graphify
-```
-
-(replace `my-workspace` with whatever `name` your root `package.json` has)
-
-### `purge` (per project, including workspace root)
-
-Runs `graphify uninstall --project --purge`, scoped to that project's own
-directory (or the workspace root, if run there). This removes that
-project's `graphify-out` directory — nothing else, no agent skills are
-touched. Not cached, since deleting output isn't a reproducible build step.
-
-```bash
-# clean one project's graphify-out
-nx run my-app:purge
-
-# clean every project's graphify-out in one go
-nx run-many -t purge
-
-# clean only what's affected by your current changes
-nx affected -t purge
-```
-
-## Options
-
-| Option        | Type    | Default        | Description                                                                                                                                                          |
-| ------------- | ------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `outputDir`   | string  | `graphify-out` | **Not yet configurable** — graphify has no `--output-dir` flag, so this is always `graphify-out` regardless of what you set; reserved for when graphify adds support |
-| `mode`        | enum    | `normal`       | `normal` or `deep` (more aggressive inference)                                                                                                                       |
-| `update`      | boolean | `false`        | Re-extract changed files only, merge into graph                                                                                                                      |
-| `clusterOnly` | boolean | `false`        | Rerun clustering without re-extraction                                                                                                                               |
-| `noViz`       | boolean | `false`        | Skip `graph.html`, produce report + JSON only                                                                                                                        |
-| `wiki`        | boolean | `false`        | Export Wikipedia-style markdown per community                                                                                                                        |
-| `obsidian`    | boolean | `false`        | Export an Obsidian vault                                                                                                                                             |
-| `svg`         | boolean | `false`        | Export `graph.svg`                                                                                                                                                   |
-| `graphml`     | boolean | `false`        | Export `graph.graphml` (Gephi/yEd)                                                                                                                                   |
-| `neo4j`       | boolean | `false`        | Generate `cypher.txt`                                                                                                                                                |
-| `neo4jPush`   | string  | —              | `bolt://` URL to push directly to Neo4j                                                                                                                              |
-| `provider`    | object  | —              | `{ backend, model }` — select an LLM backend for extraction                                                                                                          |
-
-### `provider.backend` / `provider.model`
-
-`provider.backend` is one of `azure`, `bedrock`, `claude`, `claude-cli`,
-`deepseek`, `gemini`, `kimi`, `ollama`, `openai`. `provider.model` is a
-free-text model identifier and is only valid alongside `provider.backend`
-(setting `model` without `backend` throws).
-
-```json
-{
-  "plugins": [
-    {
-      "plugin": "@fennet82/nx-graphify/plugin",
-      "options": {
-        "provider": { "backend": "openai", "model": "gpt-4" }
-      }
-    }
-  ]
-}
-```
-
-Using a local Ollama model instead, just for one project:
-
-```json
-{
-  "name": "my-app",
-  "targets": {
-    "graphify": {
-      "options": {
-        "provider": { "backend": "ollama", "model": "llama3" }
-      }
-    }
-  }
-}
-```
-
-## Examples
-
-Export an Obsidian vault and a Wikipedia-style markdown dump alongside the
-default HTML graph, workspace-wide:
-
-```json
-{
-  "plugins": [
-    {
-      "plugin": "@fennet82/nx-graphify/plugin",
-      "options": { "obsidian": true, "wiki": true }
-    }
-  ]
-}
-```
-
-Push straight to Neo4j instead of writing local exports, for one project
-only:
-
-```json
-{
-  "name": "my-app",
-  "targets": {
-    "graphify": {
-      "options": {
-        "noViz": true,
-        "neo4j": true,
-        "neo4jPush": "bolt://localhost:7687"
-      }
-    }
-  }
-}
-```
-
-Install Claude and Cursor skills, run an extraction, then clean up the
-output for one project:
-
-```bash
-nx g @fennet82/nx-graphify:init --installAgent=claude --installAgent=cursor
-nx run my-app:graphify
-nx run my-app:purge
+pnpm install
+npx nx build nx-graphify
+npx nx test nx-graphify
+npx nx e2e nx-graphify-e2e
 ```
