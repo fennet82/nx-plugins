@@ -11,11 +11,11 @@ export interface GraphifyTargetOptions {
 }
 
 export interface GraphifyPluginOptions {
-  genTarget?: string | GraphifyTargetOptions;
-  updateTarget?: string | GraphifyTargetOptions;
-  queryTarget?: string | GraphifyTargetOptions;
-  pathTarget?: string | GraphifyTargetOptions;
-  explainTarget?: string | GraphifyTargetOptions;
-  prsTarget?: string | GraphifyTargetOptions;
-  purgeTarget?: string | GraphifyTargetOptions;
+  extractGraphifyTargetName?: string | GraphifyTargetOptions;
+  updateGraphifyTargetName?: string | GraphifyTargetOptions;
+  queryGraphifyTargetName?: string | GraphifyTargetOptions;
+  pathGraphifyTargetName?: string | GraphifyTargetOptions;
+  explainGraphifyTargetName?: string | GraphifyTargetOptions;
+  prsGraphifyTargetName?: string | GraphifyTargetOptions;
+  purgeGraphifyTargetName?: string | GraphifyTargetOptions;
 }

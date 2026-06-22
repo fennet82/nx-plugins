@@ -32,13 +32,13 @@ Register the plugin in your `nx.json`:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "genTarget": { "name": "graphify:gen" },
-        "updateTarget": { "name": "graphify:update" },
-        "queryTarget": { "name": "graphify:query" },
-        "pathTarget": { "name": "graphify:path" },
-        "explainTarget": { "name": "graphify:explain" },
-        "prsTarget": { "name": "graphify:prs" },
-        "purgeTarget": { "name": "graphify:purge" }
+        "extractGraphifyTargetName": "graphify:extract",
+        "updateGraphifyTargetName": "graphify:update",
+        "queryGraphifyTargetName": "graphify:query",
+        "pathGraphifyTargetName": "graphify:path",
+        "explainGraphifyTargetName": "graphify:explain",
+        "prsGraphifyTargetName": "graphify:prs",
+        "purgeGraphifyTargetName": "graphify:purge"
       }
     }
   ]
@@ -48,7 +48,7 @@ Register the plugin in your `nx.json`:
 Or run `nx g @fennet82/nx-graphify:init`, which writes the above for you.
 
 This infers 7 command-based targets on every project (including the
-workspace root): `graphify:gen`, `graphify:update`, `graphify:query`,
+workspace root): `graphify:extract`, `graphify:update`, `graphify:query`,
 `graphify:path`, `graphify:explain`, `graphify:prs`, `graphify:purge`. Each
 target's name and its `args`/`env`/`cwd` are configurable — see
 [packages/nx-graphify/README.md](./packages/nx-graphify/README.md) for the
@@ -59,7 +59,7 @@ merge with a target's base `args`/`env`/`envFile`/`cwd`.
 
 | Command                                                      | What it runs                                                                             |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `nx run <project>:graphify:gen`                              | `graphify extract . [args]`                                                              |
+| `nx run <project>:graphify:extract`                          | `graphify extract . [args]`                                                              |
 | `nx run <project>:graphify:update`                           | `graphify update . [args]`                                                               |
 | `nx run <project>:graphify:query -- "<question>"`            | `graphify query "<question>" [args]`                                                     |
 | `nx run <project>:graphify:path -- "A" "B"`                  | `graphify path "A" "B" [args]`                                                           |

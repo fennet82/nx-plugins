@@ -90,13 +90,13 @@ describe('nx-graphify', () => {
       (p: { plugin?: string }) => p?.plugin === '@fennet82/nx-graphify/plugin',
     );
     expect(plugin.options).toEqual({
-      genTarget: { name: 'graphify:gen' },
-      updateTarget: { name: 'graphify:update' },
-      queryTarget: { name: 'graphify:query' },
-      pathTarget: { name: 'graphify:path' },
-      explainTarget: { name: 'graphify:explain' },
-      prsTarget: { name: 'graphify:prs' },
-      purgeTarget: { name: 'graphify:purge' },
+      extractGraphifyTargetName: 'graphify:extract',
+      updateGraphifyTargetName: 'graphify:update',
+      queryGraphifyTargetName: 'graphify:query',
+      pathGraphifyTargetName: 'graphify:path',
+      explainGraphifyTargetName: 'graphify:explain',
+      prsGraphifyTargetName: 'graphify:prs',
+      purgeGraphifyTargetName: 'graphify:purge',
     });
   });
 
@@ -120,8 +120,8 @@ describe('nx-graphify', () => {
     );
   });
 
-  it('runs `graphify extract . {args}` via the inferred graphify:gen target', async () => {
-    await runNxCommandAsync('run sample:graphify:gen');
+  it('runs `graphify extract . {args}` via the inferred graphify:extract target', async () => {
+    await runNxCommandAsync('run sample:graphify:extract');
 
     expect(readFile(graphifyLogFile)).toContain('[extract][.]');
   });

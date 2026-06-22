@@ -29,13 +29,13 @@ Register the plugin in your workspace's `nx.json`:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "genTarget": { "name": "graphify:gen" },
-        "updateTarget": { "name": "graphify:update" },
-        "queryTarget": { "name": "graphify:query" },
-        "pathTarget": { "name": "graphify:path" },
-        "explainTarget": { "name": "graphify:explain" },
-        "prsTarget": { "name": "graphify:prs" },
-        "purgeTarget": { "name": "graphify:purge" }
+        "extractGraphifyTargetName": "graphify:extract",
+        "updateGraphifyTargetName": "graphify:update",
+        "queryGraphifyTargetName": "graphify:query",
+        "pathGraphifyTargetName": "graphify:path",
+        "explainGraphifyTargetName": "graphify:explain",
+        "prsGraphifyTargetName": "graphify:prs",
+        "purgeGraphifyTargetName": "graphify:purge"
       }
     }
   ]
@@ -53,20 +53,21 @@ only to depend on its own plugins) makes the root a project too, so there's
 no separate "whole workspace" target — running any target on the root
 project already covers that case.
 
-Each plugin option accepts either a plain string (just renames the target)
-or an object — `{ name, args, env, envFile, cwd, configurations }`. All
-graphify CLI flags are passed straight through as `args`; there's no
-structured schema to keep in sync with graphify's own flags.
+Each plugin option accepts either a plain string (just renames the target,
+shown above) or an object — `{ name, args, env, envFile, cwd, configurations }`
+(see [Per-configuration overrides](#per-configuration-overrides) for the
+object form). All graphify CLI flags are passed straight through as `args`;
+there's no structured schema to keep in sync with graphify's own flags.
 
 ## Guides
 
 ### Build a graph from scratch
 
-The first run of `graphify:gen` on a project builds its graph from nothing —
-there's no separate "init the graph" step:
+The first run of `graphify:extract` on a project builds its graph from
+nothing — there's no separate "init the graph" step:
 
 ```bash
-nx run my-app:graphify:gen
+nx run my-app:graphify:extract
 ```
 
 This scans `my-app`'s project root, runs Tree-sitter AST extraction plus LLM
@@ -77,7 +78,7 @@ whole workspace's graph in one shot works the same way, since the workspace
 root is a project too:
 
 ```bash
-nx run my-workspace:graphify:gen
+nx run my-workspace:graphify:extract
 ```
 
 (replace `my-workspace` with whatever `name` your root `package.json` has).
@@ -85,16 +86,16 @@ To build every project's graph in one command instead of just the root's,
 use `run-many` or `affected`:
 
 ```bash
-nx run-many -t graphify:gen
-nx affected -t graphify:gen
+nx run-many -t graphify:extract
+nx affected -t graphify:extract
 ```
 
-`graphify:gen` is cached by Nx — rerunning it with no relevant file changes
-replays the cached result instead of calling `graphify` again.
+`graphify:extract` is cached by Nx — rerunning it with no relevant file
+changes replays the cached result instead of calling `graphify` again.
 
 ### Update an existing graph
 
-Once a graph exists, re-running `graphify:gen` rebuilds it from scratch.
+Once a graph exists, re-running `graphify:extract` rebuilds it from scratch.
 `graphify:update` instead re-extracts only the files that changed since the
 last build and merges the result into the existing graph — cheaper, and
 skips the LLM step entirely unless you also pass extract-style flags:
@@ -112,15 +113,15 @@ sign of a broken rebuild):
 nx run my-app:graphify:update -- --force
 ```
 
-Like `graphify:gen`, `graphify:update` is cached, and works the same way
+Like `graphify:extract`, `graphify:update` is cached, and works the same way
 against the workspace root or via `run-many`/`affected`.
 
 ### Setting an LLM backend
 
-`genTarget`/`updateTarget` extraction needs an LLM backend for semantic
-(non-AST) analysis. graphify auto-detects a backend from whichever API key
-is set in the environment — no `--backend` flag needed if exactly one of
-these is set:
+`extractGraphifyTargetName`/`updateGraphifyTargetName` extraction needs an
+LLM backend for semantic (non-AST) analysis. graphify auto-detects a backend
+from whichever API key is set in the environment — no `--backend` flag
+needed if exactly one of these is set:
 
 | Backend    | Env var(s)                                       |
 | ---------- | ------------------------------------------------ |
@@ -139,7 +140,7 @@ To pin a specific backend/model instead of relying on auto-detection, pass
 {
   "name": "my-app",
   "targets": {
-    "graphify:gen": {
+    "graphify:extract": {
       "options": {
         "args": ["--backend", "openai", "--model", "gpt-4"]
       }
@@ -160,8 +161,8 @@ instead — both are passed straight through to Nx's `command` executor:
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "genTarget": {
-          "name": "graphify:gen",
+        "extractGraphifyTargetName": {
+          "name": "graphify:extract",
           "env": { "GRAPHIFY_MAX_WORKERS": "4" }
         }
       }
@@ -179,7 +180,7 @@ of version control:
 {
   "name": "my-app",
   "targets": {
-    "graphify:gen": {
+    "graphify:extract": {
       "options": {
         "envFile": ".env.graphify"
       }
@@ -208,7 +209,10 @@ scopes, depending on how broadly the change should apply:
       {
         "plugin": "@fennet82/nx-graphify/plugin",
         "options": {
-          "genTarget": { "name": "graphify:gen", "args": ["--mode", "deep"] }
+          "extractGraphifyTargetName": {
+            "name": "graphify:extract",
+            "args": ["--mode", "deep"]
+          }
         }
       }
     ]
@@ -223,7 +227,7 @@ scopes, depending on how broadly the change should apply:
   touching any config file at all:
 
   ```bash
-  nx run my-app:graphify:gen -- --mode deep
+  nx run my-app:graphify:extract -- --mode deep
   ```
 
 These three scopes behave differently, and it matters which one you reach
@@ -231,45 +235,46 @@ for:
 
 - **Per-invocation flags genuinely layer on top of configured `args`.** Nx's
   `command` executor concatenates whatever follows `--` on the CLI with the
-  target's own configured `args`, so `nx run my-app:graphify:gen -- --mode deep`
-  runs with both the configured args _and_ `--mode deep`.
+  target's own configured `args`, so
+  `nx run my-app:graphify:extract -- --mode deep` runs with both the
+  configured args _and_ `--mode deep`.
 - **Per-project `project.json` options replace, not merge.** If `nx.json`
-  configures `genTarget.args: ['--mode', 'deep']` workspace-wide and a
-  project's `project.json` sets its own `args: ['--backend', 'openai']` for
-  `graphify:gen`, that project runs with `--backend openai` only — `--mode
-deep` is gone, since Nx replaces array-valued options wholesale rather
-  than concatenating them when merging an explicit project target over an
-  inferred one. If you need both, repeat every flag you want in the
-  project-level `args`.
+  configures `extractGraphifyTargetName.args: ['--mode', 'deep']`
+  workspace-wide and a project's `project.json` sets its own
+  `args: ['--backend', 'openai']` for `graphify:extract`, that project runs
+  with `--backend openai` only — `--mode deep` is gone, since Nx replaces
+  array-valued options wholesale rather than concatenating them when merging
+  an explicit project target over an inferred one. If you need both, repeat
+  every flag you want in the project-level `args`.
 - **Target `configurations`** behave the same way — see
   [Per-configuration overrides](#per-configuration-overrides) below.
 
 ## Targets
 
-### `graphify:gen` — `genTarget`
+### `graphify:extract` — `extractGraphifyTargetName`
 
 Runs `graphify extract . {args}` (cwd = the project's root). Creates
 `graphify-out/` (`graph.json`, `manifest.json`, `.graphify_analysis.json`,
 plus clustering output) and is cached by Nx like any other build target.
 
 ```bash
-nx run my-app:graphify:gen
-nx run my-app:graphify:gen -- --backend openai --model gpt-4
-nx run my-app:graphify:gen -- --mode deep --max-workers 4
+nx run my-app:graphify:extract
+nx run my-app:graphify:extract -- --backend openai --model gpt-4
+nx run my-app:graphify:extract -- --mode deep --max-workers 4
 ```
 
-### `graphify:update` — `updateTarget`
+### `graphify:update` — `updateGraphifyTargetName`
 
 Runs `graphify update . {args}`. Re-extracts changed files only and merges
 into the existing graph — no LLM needed unless you also pass extract-style
-flags. Cached the same way as `graphify:gen`.
+flags. Cached the same way as `graphify:extract`.
 
 ```bash
 nx run my-app:graphify:update
 nx run my-app:graphify:update -- --force
 ```
 
-### `graphify:query` — `queryTarget`
+### `graphify:query` — `queryGraphifyTargetName`
 
 Runs `graphify query {args}` against the project's `graphify-out/graph.json`.
 Not cached — it's a read, not a build.
@@ -279,7 +284,7 @@ nx run my-app:graphify:query -- "what calls the auth middleware?"
 nx run my-app:graphify:query -- "what calls the auth middleware?" --dfs --budget 500
 ```
 
-### `graphify:path` — `pathTarget`
+### `graphify:path` — `pathGraphifyTargetName`
 
 Runs `graphify path {args}` — shortest path between two nodes in the graph.
 
@@ -287,7 +292,7 @@ Runs `graphify path {args}` — shortest path between two nodes in the graph.
 nx run my-app:graphify:path -- "UserService" "Database"
 ```
 
-### `graphify:explain` — `explainTarget`
+### `graphify:explain` — `explainGraphifyTargetName`
 
 Runs `graphify explain {args}` — plain-language explanation of a node and
 its neighbors.
@@ -296,7 +301,7 @@ its neighbors.
 nx run my-app:graphify:explain -- "UserService.login"
 ```
 
-### `graphify:prs` — `prsTarget`
+### `graphify:prs` — `prsGraphifyTargetName`
 
 Runs `graphify prs {args}` — a dashboard of open PRs against the repo, with
 optional triage/conflict/graph-impact analysis.
@@ -307,7 +312,7 @@ nx run my-app:graphify:prs -- --triage
 nx run my-app:graphify:prs -- --conflicts
 ```
 
-### `graphify:purge` — `purgeTarget`
+### `graphify:purge` — `purgeGraphifyTargetName`
 
 Runs `graphify uninstall --project --purge {args}`, scoped to that project's
 own directory. Removes that project's `graphify-out/` directory only — no
@@ -329,7 +334,7 @@ its own entry to `targets` in `project.json`:
 {
   "name": "my-app",
   "targets": {
-    "graphify:gen": {
+    "graphify:extract": {
       "options": {
         "args": ["--backend", "ollama", "--model", "llama3"]
       }
@@ -352,7 +357,7 @@ above for the full breakdown of which override scope merges vs. replaces.
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "genTarget": "extract"
+        "extractGraphifyTargetName": "extract"
       }
     }
   ]
@@ -360,7 +365,7 @@ above for the full breakdown of which override scope merges vs. replaces.
 ```
 
 Now every project's extraction target is `nx run my-app:extract` instead of
-`nx run my-app:graphify:gen`.
+`nx run my-app:graphify:extract`.
 
 ## Per-configuration overrides
 
@@ -370,8 +375,8 @@ Now every project's extraction target is `nx run my-app:extract` instead of
     {
       "plugin": "@fennet82/nx-graphify/plugin",
       "options": {
-        "genTarget": {
-          "name": "graphify:gen",
+        "extractGraphifyTargetName": {
+          "name": "graphify:extract",
           "configurations": {
             "ci": { "args": ["--no-cluster"] }
           }
@@ -383,7 +388,7 @@ Now every project's extraction target is `nx run my-app:extract` instead of
 ```
 
 ```bash
-nx run my-app:graphify:gen:ci
+nx run my-app:graphify:extract:ci
 ```
 
 A configuration's `args`/`env`/`envFile`/`cwd` fully replace the parent

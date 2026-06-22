@@ -10,13 +10,13 @@ import type { GraphifyPluginOptions, GraphifyTargetOptions } from './schema';
 const GRAPHIFY_CONFIG_GLOB = '{**/project.json,**/package.json}';
 
 export const DEFAULT_TARGET_NAMES = {
-  genTarget: 'graphify:gen',
-  updateTarget: 'graphify:update',
-  queryTarget: 'graphify:query',
-  pathTarget: 'graphify:path',
-  explainTarget: 'graphify:explain',
-  prsTarget: 'graphify:prs',
-  purgeTarget: 'graphify:purge',
+  extractGraphifyTargetName: 'graphify:extract',
+  updateGraphifyTargetName: 'graphify:update',
+  queryGraphifyTargetName: 'graphify:query',
+  pathGraphifyTargetName: 'graphify:path',
+  explainGraphifyTargetName: 'graphify:explain',
+  prsGraphifyTargetName: 'graphify:prs',
+  purgeGraphifyTargetName: 'graphify:purge',
 } as const;
 
 type NormalizedGraphifyTargetOptions = GraphifyTargetOptions & {
@@ -24,13 +24,13 @@ type NormalizedGraphifyTargetOptions = GraphifyTargetOptions & {
 };
 
 interface NormalizedGraphifyPluginOptions {
-  genTarget: NormalizedGraphifyTargetOptions;
-  updateTarget: NormalizedGraphifyTargetOptions;
-  queryTarget: NormalizedGraphifyTargetOptions;
-  pathTarget: NormalizedGraphifyTargetOptions;
-  explainTarget: NormalizedGraphifyTargetOptions;
-  prsTarget: NormalizedGraphifyTargetOptions;
-  purgeTarget: NormalizedGraphifyTargetOptions;
+  extractGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  updateGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  queryGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  pathGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  explainGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  prsGraphifyTargetName: NormalizedGraphifyTargetOptions;
+  purgeGraphifyTargetName: NormalizedGraphifyTargetOptions;
 }
 
 function normalizeTarget(
@@ -50,33 +50,33 @@ export function normalizePluginOptions(
   options: GraphifyPluginOptions = {},
 ): NormalizedGraphifyPluginOptions {
   return {
-    genTarget: normalizeTarget(
-      options.genTarget,
-      DEFAULT_TARGET_NAMES.genTarget,
+    extractGraphifyTargetName: normalizeTarget(
+      options.extractGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.extractGraphifyTargetName,
     ),
-    updateTarget: normalizeTarget(
-      options.updateTarget,
-      DEFAULT_TARGET_NAMES.updateTarget,
+    updateGraphifyTargetName: normalizeTarget(
+      options.updateGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.updateGraphifyTargetName,
     ),
-    queryTarget: normalizeTarget(
-      options.queryTarget,
-      DEFAULT_TARGET_NAMES.queryTarget,
+    queryGraphifyTargetName: normalizeTarget(
+      options.queryGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.queryGraphifyTargetName,
     ),
-    pathTarget: normalizeTarget(
-      options.pathTarget,
-      DEFAULT_TARGET_NAMES.pathTarget,
+    pathGraphifyTargetName: normalizeTarget(
+      options.pathGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.pathGraphifyTargetName,
     ),
-    explainTarget: normalizeTarget(
-      options.explainTarget,
-      DEFAULT_TARGET_NAMES.explainTarget,
+    explainGraphifyTargetName: normalizeTarget(
+      options.explainGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.explainGraphifyTargetName,
     ),
-    prsTarget: normalizeTarget(
-      options.prsTarget,
-      DEFAULT_TARGET_NAMES.prsTarget,
+    prsGraphifyTargetName: normalizeTarget(
+      options.prsGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.prsGraphifyTargetName,
     ),
-    purgeTarget: normalizeTarget(
-      options.purgeTarget,
-      DEFAULT_TARGET_NAMES.purgeTarget,
+    purgeGraphifyTargetName: normalizeTarget(
+      options.purgeGraphifyTargetName,
+      DEFAULT_TARGET_NAMES.purgeGraphifyTargetName,
     ),
   };
 }
@@ -152,44 +152,44 @@ export const createNodes: CreateNodes<GraphifyPluginOptions> = [
         const normalized = normalizePluginOptions(options);
 
         const targets: Record<string, TargetConfiguration> = {
-          [normalized.genTarget.name]: buildCommandTarget(
-            normalized.genTarget,
+          [normalized.extractGraphifyTargetName.name]: buildCommandTarget(
+            normalized.extractGraphifyTargetName,
             projectRoot,
             'graphify extract . {args}',
             true,
           ),
-          [normalized.updateTarget.name]: buildCommandTarget(
-            normalized.updateTarget,
+          [normalized.updateGraphifyTargetName.name]: buildCommandTarget(
+            normalized.updateGraphifyTargetName,
             projectRoot,
             'graphify update . {args}',
             true,
           ),
-          [normalized.queryTarget.name]: buildCommandTarget(
-            normalized.queryTarget,
+          [normalized.queryGraphifyTargetName.name]: buildCommandTarget(
+            normalized.queryGraphifyTargetName,
             projectRoot,
             'graphify query {args}',
             false,
           ),
-          [normalized.pathTarget.name]: buildCommandTarget(
-            normalized.pathTarget,
+          [normalized.pathGraphifyTargetName.name]: buildCommandTarget(
+            normalized.pathGraphifyTargetName,
             projectRoot,
             'graphify path {args}',
             false,
           ),
-          [normalized.explainTarget.name]: buildCommandTarget(
-            normalized.explainTarget,
+          [normalized.explainGraphifyTargetName.name]: buildCommandTarget(
+            normalized.explainGraphifyTargetName,
             projectRoot,
             'graphify explain {args}',
             false,
           ),
-          [normalized.prsTarget.name]: buildCommandTarget(
-            normalized.prsTarget,
+          [normalized.prsGraphifyTargetName.name]: buildCommandTarget(
+            normalized.prsGraphifyTargetName,
             projectRoot,
             'graphify prs {args}',
             false,
           ),
-          [normalized.purgeTarget.name]: buildCommandTarget(
-            normalized.purgeTarget,
+          [normalized.purgeGraphifyTargetName.name]: buildCommandTarget(
+            normalized.purgeGraphifyTargetName,
             projectRoot,
             'graphify uninstall --project --purge {args}',
             false,

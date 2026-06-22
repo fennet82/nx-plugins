@@ -6,13 +6,13 @@ import type { InitGeneratorSchema } from './schema';
 const PLUGIN_PATH = '@fennet82/nx-graphify/plugin';
 
 const DEFAULT_PLUGIN_OPTIONS = {
-  genTarget: { name: DEFAULT_TARGET_NAMES.genTarget },
-  updateTarget: { name: DEFAULT_TARGET_NAMES.updateTarget },
-  queryTarget: { name: DEFAULT_TARGET_NAMES.queryTarget },
-  pathTarget: { name: DEFAULT_TARGET_NAMES.pathTarget },
-  explainTarget: { name: DEFAULT_TARGET_NAMES.explainTarget },
-  prsTarget: { name: DEFAULT_TARGET_NAMES.prsTarget },
-  purgeTarget: { name: DEFAULT_TARGET_NAMES.purgeTarget },
+  extractGraphifyTargetName: DEFAULT_TARGET_NAMES.extractGraphifyTargetName,
+  updateGraphifyTargetName: DEFAULT_TARGET_NAMES.updateGraphifyTargetName,
+  queryGraphifyTargetName: DEFAULT_TARGET_NAMES.queryGraphifyTargetName,
+  pathGraphifyTargetName: DEFAULT_TARGET_NAMES.pathGraphifyTargetName,
+  explainGraphifyTargetName: DEFAULT_TARGET_NAMES.explainGraphifyTargetName,
+  prsGraphifyTargetName: DEFAULT_TARGET_NAMES.prsGraphifyTargetName,
+  purgeGraphifyTargetName: DEFAULT_TARGET_NAMES.purgeGraphifyTargetName,
 };
 
 export default async function initGenerator(

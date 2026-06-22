@@ -13,18 +13,21 @@ function fakeContext(): CreateNodesContext {
 describe('normalizePluginOptions', () => {
   it('fills in default target names when no options are given', () => {
     expect(normalizePluginOptions()).toEqual({
-      genTarget: { name: 'graphify:gen' },
-      updateTarget: { name: 'graphify:update' },
-      queryTarget: { name: 'graphify:query' },
-      pathTarget: { name: 'graphify:path' },
-      explainTarget: { name: 'graphify:explain' },
-      prsTarget: { name: 'graphify:prs' },
-      purgeTarget: { name: 'graphify:purge' },
+      extractGraphifyTargetName: { name: 'graphify:extract' },
+      updateGraphifyTargetName: { name: 'graphify:update' },
+      queryGraphifyTargetName: { name: 'graphify:query' },
+      pathGraphifyTargetName: { name: 'graphify:path' },
+      explainGraphifyTargetName: { name: 'graphify:explain' },
+      prsGraphifyTargetName: { name: 'graphify:prs' },
+      purgeGraphifyTargetName: { name: 'graphify:purge' },
     });
   });
 
   it('treats a string option as just the target name', () => {
-    expect(normalizePluginOptions({ genTarget: 'extract' }).genTarget).toEqual({
+    expect(
+      normalizePluginOptions({ extractGraphifyTargetName: 'extract' })
+        .extractGraphifyTargetName,
+    ).toEqual({
       name: 'extract',
     });
   });
@@ -32,8 +35,8 @@ describe('normalizePluginOptions', () => {
   it('preserves object option fields and defaults the name if missing', () => {
     expect(
       normalizePluginOptions({
-        queryTarget: { args: ['--budget', '500'] },
-      }).queryTarget,
+        queryGraphifyTargetName: { args: ['--budget', '500'] },
+      }).queryGraphifyTargetName,
     ).toEqual({ name: 'graphify:query', args: ['--budget', '500'] });
   });
 });
@@ -51,7 +54,7 @@ describe('createNodes', () => {
     const [, { projects }] = result[0];
     const targets = projects!['apps/foo'].targets!;
 
-    expect(targets['graphify:gen']).toEqual({
+    expect(targets['graphify:extract']).toEqual({
       command: 'graphify extract . {args}',
       options: { cwd: 'apps/foo' },
       cache: true,
@@ -90,21 +93,21 @@ describe('createNodes', () => {
   it('uses a custom target name from a string option', async () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
-      { genTarget: 'extract' },
+      { extractGraphifyTargetName: 'extract' },
       fakeContext(),
     );
 
     const [, { projects }] = result[0];
     const targets = projects!['apps/foo'].targets!;
     expect(targets['extract']).toBeDefined();
-    expect(targets['graphify:gen']).toBeUndefined();
+    expect(targets['graphify:extract']).toBeUndefined();
   });
 
   it('passes through args/env/envFile/cwd overrides from an object option', async () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       {
-        queryTarget: {
+        queryGraphifyTargetName: {
           name: 'graphify:query',
           args: ['--budget', '500'],
           env: { GRAPHIFY_DEBUG: '1' },
@@ -131,8 +134,8 @@ describe('createNodes', () => {
     const result = await createNodesFunction(
       ['apps/foo/project.json'],
       {
-        genTarget: {
-          name: 'graphify:gen',
+        extractGraphifyTargetName: {
+          name: 'graphify:extract',
           configurations: { ci: { args: ['--no-cluster'] } },
         },
       },
@@ -141,7 +144,7 @@ describe('createNodes', () => {
 
     const [, { projects }] = result[0];
     expect(
-      projects!['apps/foo'].targets!['graphify:gen'].configurations,
+      projects!['apps/foo'].targets!['graphify:extract'].configurations,
     ).toEqual({
       ci: { cwd: 'apps/foo', args: ['--no-cluster'] },
     });
@@ -158,7 +161,7 @@ describe('createNodes', () => {
       result.flatMap(([, { projects }]) => Object.entries(projects ?? {})),
     );
 
-    expect(projectsByRoot['.'].targets!['graphify:gen']).toEqual({
+    expect(projectsByRoot['.'].targets!['graphify:extract']).toEqual({
       command: 'graphify extract . {args}',
       options: { cwd: '.' },
       cache: true,

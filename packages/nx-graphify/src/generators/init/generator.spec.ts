@@ -10,13 +10,13 @@ vi.mock('../../utils/check-graphify', () => ({
 }));
 
 const DEFAULT_PLUGIN_OPTIONS = {
-  genTarget: { name: DEFAULT_TARGET_NAMES.genTarget },
-  updateTarget: { name: DEFAULT_TARGET_NAMES.updateTarget },
-  queryTarget: { name: DEFAULT_TARGET_NAMES.queryTarget },
-  pathTarget: { name: DEFAULT_TARGET_NAMES.pathTarget },
-  explainTarget: { name: DEFAULT_TARGET_NAMES.explainTarget },
-  prsTarget: { name: DEFAULT_TARGET_NAMES.prsTarget },
-  purgeTarget: { name: DEFAULT_TARGET_NAMES.purgeTarget },
+  extractGraphifyTargetName: DEFAULT_TARGET_NAMES.extractGraphifyTargetName,
+  updateGraphifyTargetName: DEFAULT_TARGET_NAMES.updateGraphifyTargetName,
+  queryGraphifyTargetName: DEFAULT_TARGET_NAMES.queryGraphifyTargetName,
+  pathGraphifyTargetName: DEFAULT_TARGET_NAMES.pathGraphifyTargetName,
+  explainGraphifyTargetName: DEFAULT_TARGET_NAMES.explainGraphifyTargetName,
+  prsGraphifyTargetName: DEFAULT_TARGET_NAMES.prsGraphifyTargetName,
+  purgeGraphifyTargetName: DEFAULT_TARGET_NAMES.purgeGraphifyTargetName,
 };
 
 describe('init generator', () => {
@@ -54,7 +54,7 @@ describe('init generator', () => {
     nxJson.plugins = [
       {
         plugin: '@fennet82/nx-graphify/plugin',
-        options: { genTarget: 'extract' },
+        options: { extractGraphifyTargetName: 'extract' },
       },
     ];
     updateNxJson(tree, nxJson);
@@ -64,7 +64,7 @@ describe('init generator', () => {
     expect(readNxJson(tree)?.plugins).toEqual([
       {
         plugin: '@fennet82/nx-graphify/plugin',
-        options: { genTarget: 'extract' },
+        options: { extractGraphifyTargetName: 'extract' },
       },
     ]);
   });
